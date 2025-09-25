@@ -1,46 +1,105 @@
-# SIRECOV (friend-plus) · Sprint 1
+# 📌 SIRECOV — Sprint 1 (friend-plus)
 
-Mejora del proyecto del amigo:
-- **UI con Tailwind** (formularios, toasts, layout limpio).
-- Backend Express sirve el **frontend estático** (todo en un mismo puerto).
-- **CSV con cabecera** `country,date,type,cases` y lectura que **omite la cabecera**.
-- Validaciones estrictas (fecha ISO; type ∈ confirmed|death|recovered; cases entero ≥ 0).
-- Evita duplicados por clave `country+date+type` (409).
+Sistema de Registro y Consulta de Casos COVID (SIRECOV) — primera entrega del curso de **Análisis de Datos**.  
+Proyecto construido con **Node.js + Express** y **frontend con TailwindCSS**.
 
-## Ejecutar
-```bash
-npm install
-npm start
-# abrir http://localhost:3000
-```
+---
 
-## Endpoints
-- `POST /records`  → guarda registro CSV.
-- `GET /records?country=&date=&type=` → consulta por clave única.
-- `GET /health` → ping.
+## ✨ Características
 
-## Estructura
+- Captura de registros con **validaciones estrictas**:
+  - Fecha en formato `YYYY-MM-DD`
+  - Tipo ∈ `confirmed | death | recovered`
+  - Casos entero ≥ 0
+- Persistencia en archivo plano `data/covid_records.txt` (CSV con cabecera).
+- Consulta por clave única **country + date + type**.
+- Manejo de errores:
+  - `400` → parámetros inválidos
+  - `404` → registro no encontrado
+  - `409` → duplicado
+- Frontend moderno con **TailwindCSS**.
+- Backend y frontend servidos en un mismo puerto (`http://localhost:3000`).
+
+---
+
+## 📂 Estructura del proyecto
+
 ```
 sirecov_friend_plus/
-├─ .gitignore
-├─ package.json
 ├─ backend/
-│  ├─ server.js
-│  ├─ storage.js
-│  └─ validator.js
+│  ├─ server.js      # servidor Express
+│  ├─ storage.js     # persistencia en CSV
+│  └─ validator.js   # validaciones
 ├─ frontend/
-│  ├─ index.html
-│  └─ app.js
-└─ data/
-   └─ covid_records.txt
+│  ├─ index.html     # UI con Tailwind
+│  └─ app.js         # lógica de frontend
+├─ data/
+│  └─ covid_records.txt   # archivo de registros
+├─ package.json
+├─ README.md
+└─ .gitignore
 ```
 
-## Subir a GitHub
+---
+
+## ⚡ Requisitos
+
+- Node.js 18 o superior  
+- Navegador moderno (Chrome, Edge, Firefox…)
+
+---
+
+## ▶ Ejecución
+
 ```bash
-git init
-git add .
-git commit -m "feat: Sprint 1 (friend-plus) UI Tailwind + CSV header + static hosting"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/sirecov_friend_plus.git
-git push -u origin main
+# Instalar dependencias
+npm install
+
+# Levantar el servidor
+npm start
+
+# Abrir en el navegador
+http://localhost:3000
 ```
+
+---
+
+## 🧪 Endpoints de la API
+
+### Health check
+```bash
+curl http://localhost:3000/health
+```
+
+### Crear registro
+```bash
+curl -X POST http://localhost:3000/records ^
+ -H "Content-Type: application/json" ^
+ -d "{\"country\":\"Colombia\",\"date\":\"2020-03-20\",\"type\":\"confirmed\",\"cases\":34}"
+```
+
+### Consultar registro
+```bash
+curl "http://localhost:3000/records?country=Colombia&date=2020-03-20&type=confirmed"
+```
+
+---
+
+## 🖼️ Capturas
+
+### Formulario de captura
+![captura](./docs/captura.png)
+
+### Consulta de registros
+![consulta](./docs/consulta.png)
+
+---
+
+## 🚀 Despliegue en GitHub
+
+```bash
+git add .
+git commit -m "docs: mejorar README con ejemplos y capturas"
+git push
+```
+
