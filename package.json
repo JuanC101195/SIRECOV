@@ -1,0 +1,14 @@
+{
+  "name": "sirecov-friend-plus",
+  "version": "1.0.0",
+  "description": "SIRECOV Sprint 1 (mejora sobre el proyecto del amigo): UI Tailwind + CSV con cabecera + static hosting",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}

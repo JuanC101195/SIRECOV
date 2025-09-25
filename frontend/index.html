@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIRECOV · Primera entrega</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-semibold">SIRECOV — Primera entrega</h1>
+      <nav class="text-sm text-slate-600 space-x-4">
+        <a href="#add" class="hover:text-slate-900">Agregar</a>
+        <a href="#get" class="hover:text-slate-900">Consultar</a>
+        <a href="#format" class="hover:text-slate-900">Archivo</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <section id="add" class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-xl font-semibold mb-2">Agregar registro</h2>
+      <form id="form-add" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Country</label>
+          <input id="add-country" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Colombia">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Date (YYYY-MM-DD)</label>
+          <input id="add-date" type="date" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Type</label>
+          <select id="add-type" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+            <option value="">Selecciona…</option>
+            <option value="confirmed">confirmed</option>
+            <option value="death">death</option>
+            <option value="recovered">recovered</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Cases (entero ≥ 0)</label>
+          <input id="add-cases" type="number" min="0" step="1" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="34">
+        </div>
+        <div class="md:col-span-2 flex gap-3">
+          <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" type="submit">Guardar</button>
+          <button class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300" type="reset">Limpiar</button>
+        </div>
+      </form>
+      <p id="add-msg" class="text-sm mt-3"></p>
+    </section>
+
+    <section id="get" class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-xl font-semibold mb-2">Consultar por clave (country + date + type)</h2>
+      <form id="form-get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Country</label>
+          <input id="get-country" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Colombia">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Date</label>
+          <input id="get-date" type="date" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Type</label>
+          <select id="get-type" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
+            <option value="">Selecciona…</option>
+            <option value="confirmed">confirmed</option>
+            <option value="death">death</option>
+            <option value="recovered">recovered</option>
+          </select>
+        </div>
+        <div class="md:col-span-3">
+          <button class="px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900" type="submit">Buscar</button>
+        </div>
+      </form>
+      <div id="get-msg" class="text-sm mt-3"></div>
+      <div id="get-result" class="mt-3 hidden">
+        <div class="rounded-xl bg-slate-100 p-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+          <div><span class="font-semibold">country:</span> <span id="r-country"></span></div>
+          <div><span class="font-semibold">date:</span> <span id="r-date"></span></div>
+          <div><span class="font-semibold">type:</span> <span id="r-type"></span></div>
+          <div><span class="font-semibold">cases:</span> <span id="r-cases"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="format" class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-xl font-semibold mb-2">Formato del archivo</h2>
+      <p class="text-sm text-slate-600 mb-2">CSV con cabecera <code>country,date,type,cases</code></p>
+      <pre class="p-4 bg-slate-900 text-slate-100 rounded-xl overflow-auto text-sm">country,date,type,cases
+Colombia,2020-03-20,confirmed,34</pre>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-5 right-5 hidden">
+    <div class="px-4 py-3 rounded-xl shadow-lg text-sm" id="toast-box">Mensaje</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
