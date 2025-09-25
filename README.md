@@ -85,15 +85,11 @@ curl "http://localhost:3000/records?country=Colombia&date=2020-03-20&type=confir
 
 ---
 
-## 🖼️ Capturas
 
-### Formulario de captura
-![captura](./docs/captura.png)
+## 🖼️ Captura de la aplicación
 
-### Consulta de registros
-![consulta](./docs/consulta.png)
+![demo](./docs/demo.png)
 
----
 
 ## 🚀 Despliegue en GitHub
 
