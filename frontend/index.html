@@ -1,103 +1,1010 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SIRECOV · Primera entrega</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 text-slate-900">
-  <header class="bg-white shadow-sm sticky top-0 z-10">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-semibold">SIRECOV — Primera entrega</h1>
-      <nav class="text-sm text-slate-600 space-x-4">
-        <a href="#add" class="hover:text-slate-900">Agregar</a>
-        <a href="#get" class="hover:text-slate-900">Consultar</a>
-        <a href="#format" class="hover:text-slate-900">Archivo</a>
-      </nav>
-    </div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIRECOV v2.0 - Sistema Avanzado COVID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      /* Mejorar calidad de gráficos y texto */
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      
+      /* Optimizar canvas para alta resolución */
+      canvas {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+      
+      /* Mejorar calidad de fuentes */
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-feature-settings: 'liga' 1, 'kern' 1;
+      }
+      
+      /* Transiciones suaves */
+      .tab-button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      /* Sombras mejoradas */
+      .shadow-custom {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      
+      /* Optimizar contenedores de gráficos */
+      .chart-container {
+        position: relative;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+      }
+      
+      /* Mejorar botones y elementos interactivos */
+      button, input, select {
+        transform: translateZ(0);
+        will-change: transform;
+      }
+      
+      /* Optimización para pantallas de alta densidad */
+      @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        canvas {
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: optimize-contrast;
+        }
+      }
+      
+      /* Estilos para sistema de exportación */
+      .format-option {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .format-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .format-option.selected {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      }
+      
+      /* Animaciones para vista previa */
+      #export-preview {
+        animation: slideIn 0.3s ease-out;
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      /* Hover effects mejorados */
+      .hover-lift:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s ease;
+      }
+    </style>
+  </head>
 
-  <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
-    <section id="add" class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-xl font-semibold mb-2">Agregar registro</h2>
-      <form id="form-add" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium">Country</label>
-          <input id="add-country" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Colombia">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Date (YYYY-MM-DD)</label>
-          <input id="add-date" type="date" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Type</label>
-          <select id="add-type" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
-            <option value="">Selecciona…</option>
-            <option value="confirmed">confirmed</option>
-            <option value="death">death</option>
-            <option value="recovered">recovered</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Cases (entero ≥ 0)</label>
-          <input id="add-cases" type="number" min="0" step="1" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="34">
-        </div>
-        <div class="md:col-span-2 flex gap-3">
-          <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700" type="submit">Guardar</button>
-          <button class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300" type="reset">Limpiar</button>
-        </div>
-      </form>
-      <p id="add-msg" class="text-sm mt-3"></p>
-    </section>
+  <body class="bg-gradient-to-br from-slate-50 to-blue-50 text-slate-800 min-h-screen">
+    <header class="bg-gradient-to-r from-slate-800 to-blue-900 text-white py-6 shadow-lg">
+      <div class="max-w-7xl mx-auto px-6">
+        <h1 class="text-3xl font-bold tracking-wide">
+          🦠 SIRECOV v2.0
+          <span class="text-blue-300 text-xl font-normal">Sistema Avanzado de Análisis COVID</span>
+        </h1>
+        <p class="text-slate-300 mt-2">
+          Estructuras de datos avanzadas • Búsquedas ultrarrápidas • Análisis en tiempo real
+        </p>
+      </div>
+    </header>
 
-    <section id="get" class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-xl font-semibold mb-2">Consultar por clave (country + date + type)</h2>
-      <form id="form-get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label class="block text-sm font-medium">Country</label>
-          <input id="get-country" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Colombia">
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Date</label>
-          <input id="get-date" type="date" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Type</label>
-          <select id="get-type" class="w-full mt-1 rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required>
-            <option value="">Selecciona…</option>
-            <option value="confirmed">confirmed</option>
-            <option value="death">death</option>
-            <option value="recovered">recovered</option>
-          </select>
-        </div>
-        <div class="md:col-span-3">
-          <button class="px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900" type="submit">Buscar</button>
-        </div>
-      </form>
-      <div id="get-msg" class="text-sm mt-3"></div>
-      <div id="get-result" class="mt-3 hidden">
-        <div class="rounded-xl bg-slate-100 p-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-          <div><span class="font-semibold">country:</span> <span id="r-country"></span></div>
-          <div><span class="font-semibold">date:</span> <span id="r-date"></span></div>
-          <div><span class="font-semibold">type:</span> <span id="r-type"></span></div>
-          <div><span class="font-semibold">cases:</span> <span id="r-cases"></span></div>
+    <!-- Navegación por pestañas -->
+    <nav class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex space-x-8">
+          <button onclick="showTab('registro')" id="tab-registro" 
+            class="tab-button py-4 px-2 border-b-2 border-blue-500 text-blue-600 font-medium">
+            📝 Registro
+          </button>
+          <button onclick="showTab('consultas')" id="tab-consultas" 
+            class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300">
+            🔍 Consultas Avanzadas
+          </button>
+          <button onclick="showTab('busqueda-campo')" id="tab-busqueda-campo" 
+            class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300">
+            🎯 Búsqueda por Campo
+          </button>
+          <button onclick="showTab('estadisticas')" id="tab-estadisticas" 
+            class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300">
+            📊 Estadísticas
+          </button>
+          <button onclick="showTab('exportar')" id="tab-exportar" 
+            class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300">
+            📤 Exportar
+          </button>
+          <button onclick="showTab('sistema')" id="tab-sistema" 
+            class="tab-button py-4 px-2 border-b-2 border-transparent hover:border-gray-300">
+            ⚙️ Sistema
+          </button>
         </div>
       </div>
-    </section>
+    </nav>
 
-    <section id="format" class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-xl font-semibold mb-2">Formato del archivo</h2>
-      <p class="text-sm text-slate-600 mb-2">CSV con cabecera <code>country,date,type,cases</code></p>
-      <pre class="p-4 bg-slate-900 text-slate-100 rounded-xl overflow-auto text-sm">country,date,type,cases
-Colombia,2020-03-20,confirmed,34</pre>
-    </section>
-  </main>
+    <main class="max-w-7xl mx-auto p-6">
+      
+      <!-- TAB: Registro -->
+      <div id="content-registro" class="tab-content">
+        <div class="grid md:grid-cols-2 gap-6">
+          
+          <!-- Registrar nuevo caso -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              📝 Registrar Nuevo Caso
+            </h2>
+            <form id="form-add" class="space-y-4">
+              <div class="relative">
+                <label class="block text-sm font-medium mb-1">País</label>
+                <input id="country" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                  placeholder="Escribe para autocompletar..." autocomplete="off" required />
+                <div id="autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Fecha</label>
+                <input id="date" type="date" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Tipo</label>
+                <select id="type" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                  <option value="">Selecciona un tipo</option>
+                  <option value="confirmed">🔸 Confirmado</option>
+                  <option value="death">🔴 Fallecimiento</option>
+                  <option value="recovered">🟢 Recuperado</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Número de Casos</label>
+                <input id="cases" type="number" min="0" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                💾 Guardar Registro
+              </button>
+            </form>
+          </section>
 
-  <div id="toast" class="fixed bottom-5 right-5 hidden">
-    <div class="px-4 py-3 rounded-xl shadow-lg text-sm" id="toast-box">Mensaje</div>
-  </div>
+          <!-- Consulta individual -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              🔍 Consulta Individual
+            </h2>
+            <form id="form-get" class="space-y-4">
+              <div class="relative">
+                <label class="block text-sm font-medium mb-1">País</label>
+                <input id="g-country" placeholder="País" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" autocomplete="off" required />
+                <div id="g-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto"></div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Fecha</label>
+                <input id="g-date" type="date" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Tipo</label>
+                <select id="g-type" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" required>
+                  <option value="">Selecciona un tipo</option>
+                  <option value="confirmed">🔸 Confirmado</option>
+                  <option value="death">🔴 Fallecimiento</option>
+                  <option value="recovered">🟢 Recuperado</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                🔎 Buscar Registro
+              </button>
+            </form>
 
-  <script src="app.js"></script>
-</body>
+            <!-- Panel de datos de prueba (colapsible) -->
+            <div class="mt-4">
+              <button onclick="toggleTestData()" class="text-sm text-gray-600 hover:text-gray-800 flex items-center transition-colors">
+                <span id="test-data-icon">📋</span>
+                <span class="ml-1">Mostrar datos de prueba</span>
+              </button>
+              
+              <div id="test-data-panel" class="hidden mt-3 p-4 bg-gray-50 rounded-lg border">
+                <h4 class="font-medium text-gray-700 mb-3 flex items-center">
+                  🧪 Ejemplos de Consulta
+                  <span class="ml-2 text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">Datos reales del sistema</span>
+                </h4>
+                <div class="space-y-2">
+                  <!-- Registros que EXISTEN -->
+                  <div class="border-l-4 border-green-400 bg-green-50 p-3 rounded-r">
+                    <div class="text-xs font-medium text-green-800 mb-2">✅ Registros Existentes</div>
+                    <div class="grid gap-2">
+                      <button onclick="fillExample('colombia', '1994-11-16', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇨🇴 Colombia • 16/11/1994 • Confirmados (1,988 casos)
+                      </button>
+                      <button onclick="fillExample('colombia', '2025-01-15', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇨🇴 Colombia • 15/01/2025 • Confirmados (22 casos)
+                      </button>
+                      <button onclick="fillExample('argentina', '2020-01-15', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇦🇷 Argentina • 15/01/2020 • Confirmados (154 casos)
+                      </button>
+                      <button onclick="fillExample('colombia', '1994-04-05', 'death')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇨🇴 Colombia • 05/04/1994 • Fallecimientos (25 casos)
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Registros que NO EXISTEN -->
+                  <div class="border-l-4 border-red-400 bg-red-50 p-3 rounded-r">
+                    <div class="text-xs font-medium text-red-800 mb-2">❌ Registros Inexistentes (para probar error)</div>
+                    <button onclick="fillExample('colombia', '2025-12-25', 'confirmed')" class="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded transition-colors text-left text-xs w-full">
+                      🇨🇴 Colombia • 25/12/2025 • Confirmados (No existe)
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="mt-3 text-xs text-gray-500 text-center">
+                  💡 Haz clic en cualquier ejemplo para llenar automáticamente el formulario
+                </div>
+              </div>
+            </div>
+
+            <!-- Área de resultados dinámicos -->
+            <div id="get-result" class="hidden">
+              <!-- Los resultados se cargarán dinámicamente aquí -->
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- TAB: Consultas Avanzadas -->
+      <div id="content-consultas" class="tab-content hidden">
+        <div class="grid lg:grid-cols-2 gap-6">
+          
+          <!-- Búsquedas por rango de fechas -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              📅 Búsqueda por Rango de Fechas
+              <span class="ml-2 text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">B-Tree</span>
+            </h2>
+            <form id="form-range" class="space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1">Fecha Inicial</label>
+                  <input id="range-start" type="date" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" required />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">Fecha Final</label>
+                  <input id="range-end" type="date" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" required />
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1">Página</label>
+                  <input id="range-page" type="number" value="1" min="1" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1">Registros por página</label>
+                  <select id="range-limit" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                🔍 Buscar en Rango
+              </button>
+            </form>
+            <div id="range-results" class="mt-4"></div>
+          </section>
+
+          <!-- Casos críticos -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              🚨 Casos Críticos
+              <span class="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Priority Queue</span>
+            </h2>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium mb-1">Número de casos a mostrar</label>
+                <select id="critical-count" class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <option value="5">5 casos</option>
+                  <option value="10" selected>10 casos</option>
+                  <option value="15">15 casos</option>
+                  <option value="25">25 casos</option>
+                </select>
+              </div>
+              <button onclick="loadCriticalCases()" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                ⚡ Ver Casos Más Críticos
+              </button>
+            </div>
+            <div id="critical-results" class="mt-4"></div>
+          </section>
+
+          <!-- Búsquedas por país y fecha clásicas -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border lg:col-span-2">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              🏃‍♂️ Búsquedas Rápidas
+              <span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Hash Index</span>
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+              
+              <!-- Por fecha -->
+              <div>
+                <h3 class="font-semibold mb-2">Por Fecha</h3>
+                <form id="form-by-date" class="flex gap-2">
+                  <input id="bydate-date" type="date" class="border p-2 rounded flex-grow focus:ring-2 focus:ring-green-500 focus:border-transparent" required />
+                  <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">Buscar</button>
+                </form>
+                <div id="bydate-result" class="mt-4"></div>
+              </div>
+
+              <!-- Por país -->
+              <div>
+                <h3 class="font-semibold mb-2">Por País</h3>
+                <form id="form-by-country" class="flex gap-2">
+                  <div class="relative flex-grow">
+                    <input id="bycountry-country" placeholder="Nombre del país" class="border p-2 rounded w-full focus:ring-2 focus:ring-green-500 focus:border-transparent" autocomplete="off" required />
+                    <div id="bycountry-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto"></div>
+                  </div>
+                  <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">Buscar</button>
+                </form>
+                <div id="bycountry-result" class="mt-4"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- TAB: Búsqueda por Campo (Segunda Entrega) -->
+      <div id="content-busqueda-campo" class="tab-content hidden">
+        <div class="max-w-4xl mx-auto">
+          
+          <!-- Encabezado de la Segunda Entrega -->
+          <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-8 rounded-xl mb-8 shadow-lg">
+            <h1 class="text-3xl font-bold mb-2">🎯 Segunda Entrega</h1>
+            <p class="text-emerald-100 text-lg mb-4">Consulta por Campo Único usando Archivos de Índice</p>
+            <div class="bg-emerald-400/30 rounded-lg p-4">
+              <p class="text-sm">
+                <strong>📁 Implementación:</strong> Sistema de archivos de índice persistentes que agilizan las búsquedas por campos únicos (países y fechas).
+              </p>
+            </div>
+          </div>
+
+          <div class="grid lg:grid-cols-2 gap-8">
+            
+            <!-- Búsqueda por País -->
+            <section class="bg-white rounded-xl p-6 shadow-sm border">
+              <h2 class="text-xl font-semibold mb-4 flex items-center">
+                🌍 Búsqueda por País
+                <span class="ml-2 text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded">Campo Único</span>
+              </h2>
+              <p class="text-gray-600 text-sm mb-4">
+                Consulta optimizada usando archivo de índice. El país es un campo que identifica registros únicos.
+              </p>
+              
+              <form id="form-search-country" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1">País a Buscar</label>
+                  <input id="search-country-input" type="text" 
+                    class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" 
+                    placeholder="Ej: colombia, brazil, peru..." required />
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                  🔍 Buscar por País
+                </button>
+              </form>
+              
+              <!-- Ejemplos rápidos -->
+              <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
+                <h4 class="font-medium text-gray-700 mb-3">🚀 Ejemplos Rápidos</h4>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <button onclick="quickSearchCountry('colombia')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇨🇴 Colombia
+                  </button>
+                  <button onclick="quickSearchCountry('brazil')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇧🇷 Brazil
+                  </button>
+                  <button onclick="quickSearchCountry('peru')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇵🇪 Peru
+                  </button>
+                  <button onclick="quickSearchCountry('argentina')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇦🇷 Argentina
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- Búsqueda por Fecha -->
+            <section class="bg-white rounded-xl p-6 shadow-sm border">
+              <h2 class="text-xl font-semibold mb-4 flex items-center">
+                📅 Búsqueda por Fecha
+                <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Campo Único</span>
+              </h2>
+              <p class="text-gray-600 text-sm mb-4">
+                Consulta optimizada usando archivo de índice. La fecha es un campo que identifica registros únicos del día.
+              </p>
+              
+              <form id="form-search-date" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1">Fecha a Buscar</label>
+                  <input id="search-date-input" type="date" 
+                    class="border p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg shadow font-medium transition-colors">
+                  🔍 Buscar por Fecha
+                </button>
+              </form>
+              
+              <!-- Ejemplos rápidos -->
+              <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
+                <h4 class="font-medium text-gray-700 mb-3">🚀 Fechas de Ejemplo</h4>
+                <div class="grid grid-cols-1 gap-2 text-xs">
+                  <button onclick="quickSearchDate('2022-03-15')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2022-03-15
+                  </button>
+                  <button onclick="quickSearchDate('2022-06-30')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2022-06-30
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Área de Resultados -->
+          <section class="mt-8 bg-white rounded-xl p-6 shadow-sm border">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              📊 Resultados de Búsqueda
+            </h3>
+            <div id="unique-search-results" class="text-gray-500 text-center py-8">
+              Selecciona un tipo de búsqueda arriba para ver los resultados aquí.
+            </div>
+          </section>
+
+          <!-- Información sobre Archivos de Índice -->
+          <section class="mt-8 bg-gray-50 rounded-xl p-6 border">
+            <h3 class="text-lg font-semibold mb-4 flex items-center">
+              📁 Información de Archivos de Índice
+            </h3>
+            <div id="index-info" class="text-gray-600">
+              <button onclick="loadIndexInfo()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                📊 Cargar Info de Índices
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- TAB: Estadísticas -->
+      <div id="content-estadisticas" class="tab-content hidden">
+        <!-- Dashboard Principal con Estadísticas Generales (Ancho Completo) -->
+        <section class="bg-white rounded-xl p-8 shadow-sm border mb-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold flex items-center text-gray-800">
+              📊 Dashboard General COVID-19
+            </h2>
+            <button onclick="loadGeneralStats()" class="text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow font-medium">
+              🔄 Actualizar Datos
+            </button>
+          </div>
+          <div id="general-stats" class="space-y-6">
+            <div class="animate-pulse text-center py-12">
+              <div class="inline-block w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div class="text-xl text-blue-600 font-medium">Cargando estadísticas globales...</div>
+              <div class="text-sm text-gray-500 mt-2">Procesando datos de múltiples países</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Layout Principal: Gráficos Maximizados -->
+        <div class="space-y-6">
+          
+          <!-- Gráficos Principales en Grid Horizontal -->
+          <div class="grid lg:grid-cols-2 gap-6">
+            
+            <!-- Gráfico de Distribución (Donut) -->
+            <div class="bg-white rounded-xl p-8 shadow-sm border">
+              <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">📊 Distribución de Casos</h3>
+                <p class="text-gray-600 text-sm">Porcentaje por tipo de caso registrado</p>
+              </div>
+              <div class="flex justify-center">
+                <div class="w-full max-w-md h-96 chart-container">
+                  <canvas 
+                    id="chart-types" 
+                    class="w-full h-full"
+                    width="400" 
+                    height="400"
+                    style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                  </canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráfico de Ranking de Países -->
+            <div class="bg-white rounded-xl p-8 shadow-sm border">
+              <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">🌍 Países Más Afectados</h3>
+                <p class="text-gray-600 text-sm">Top 10 países con mayor número de casos</p>
+              </div>
+              <div class="h-96 w-full chart-container">
+                <canvas 
+                  id="chart-countries" 
+                  class="w-full h-full"
+                  width="800" 
+                  height="400"
+                  style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                </canvas>
+              </div>
+            </div>
+            
+          </div>
+
+          <!-- Panel de Análisis por País -->
+          <div class="bg-white rounded-xl p-8 shadow-sm border">
+            <div class="grid lg:grid-cols-3 gap-8">
+              
+              <!-- Formulario de Consulta -->
+              <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">🔍 Análisis Detallado</h2>
+                
+                <form id="form-country-stats" class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold mb-3 text-gray-700">Seleccionar País para Análisis Completo</label>
+                    <div class="relative">
+                      <input id="stats-country" placeholder="Escribe el nombre del país..." class="border-2 p-4 w-full rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-lg" autocomplete="off" required />
+                      <div id="stats-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto"></div>
+                    </div>
+                  </div>
+                  <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-4 rounded-lg shadow-lg font-semibold text-lg transition-all transform hover:scale-105">
+                    📈 Generar Análisis Completo
+                  </button>
+                </form>
+
+                <div class="mt-8 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                  <div class="text-center">
+                    <div class="text-3xl mb-2">💡</div>
+                    <div class="font-semibold text-blue-800 mb-2">Análisis Avanzado</div>
+                    <div class="text-sm text-blue-600">Obtén gráficos de evolución temporal, estadísticas detalladas y tendencias por país</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Área de Resultados -->
+              <div class="lg:col-span-2">
+                <div id="country-stats" class="h-full">
+                  <div class="flex items-center justify-center h-full min-h-96 border-2 border-dashed border-gray-200 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
+                    <div class="text-center p-8">
+                      <div class="text-6xl mb-4">�</div>
+                      <div class="text-xl font-semibold text-gray-700 mb-2">Panel de Análisis</div>
+                      <div class="text-gray-500">Los resultados del análisis por país aparecerán aquí</div>
+                      <div class="text-sm text-gray-400 mt-2">Gráficos interactivos • Estadísticas detalladas • Cronología temporal</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- TAB: Exportar -->
+      <div id="content-exportar" class="tab-content hidden">
+        <div class="space-y-6">
+          
+          <!-- Sección de exportación personalizada -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-2xl font-bold text-gray-800">📤 Exportar Datos</h2>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">Vista previa:</span>
+                <button id="toggle-preview" onclick="toggleExportPreview()" 
+                  class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm transition-colors">
+                  👁️ Mostrar
+                </button>
+              </div>
+            </div>
+            
+            <form id="form-export" class="grid md:grid-cols-3 gap-6">
+              <!-- Columna 1: Formato y configuración básica -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    📄 Formato de archivo
+                    <span class="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Requerido</span>
+                  </label>
+                  <div class="grid grid-cols-2 gap-3">
+                    <label class="relative cursor-pointer">
+                      <input type="radio" name="format" value="json" class="sr-only" checked onchange="updateFormatSelection('json')">
+                      <div id="format-json" class="format-option selected border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all shadow-sm">
+                        <div class="text-3xl mb-2">📄</div>
+                        <div class="font-semibold text-blue-800">JSON</div>
+                        <div class="text-xs text-blue-600 mt-1">Datos + Metadatos</div>
+                        <div class="text-xs text-blue-500 mt-1">Estructura completa</div>
+                      </div>
+                    </label>
+                    <label class="relative cursor-pointer">
+                      <input type="radio" name="format" value="excel" class="sr-only" onchange="updateFormatSelection('excel')">
+                      <div id="format-excel" class="format-option border-2 border-gray-300 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all hover:border-green-500 shadow-sm">
+                        <div class="text-3xl mb-2">📊</div>
+                        <div class="font-semibold text-gray-700">Excel</div>
+                        <div class="text-xs text-green-600 mt-1">Múltiples hojas</div>
+                        <div class="text-xs text-green-500 mt-1">Estadísticas incluidas</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">🌍 País (opcional)</label>
+                  <div class="relative">
+                    <input id="export-country" placeholder="Ej: colombia, brasil..." 
+                      class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" 
+                      autocomplete="off" />
+                    <div id="export-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border-2 rounded-lg mt-1 shadow-xl max-h-48 overflow-y-auto"></div>
+                  </div>
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <button type="button" onclick="setExportCountry('colombia')" class="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full transition-colors">
+                      🇨🇴 Colombia
+                    </button>
+                    <button type="button" onclick="setExportCountry('brasil')" class="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-2 py-1 rounded-full transition-colors">
+                      🇧🇷 Brasil
+                    </button>
+                    <button type="button" onclick="setExportCountry('')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded-full transition-colors">
+                      🌐 Todos
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna 2: Filtros de fecha y tipo -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    📅 Rango de fechas
+                    <span class="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Opcional</span>
+                  </label>
+                  <div class="space-y-3">
+                    <div>
+                      <input id="export-start" type="date" placeholder="Fecha inicial" 
+                        class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
+                    </div>
+                    <div>
+                      <input id="export-end" type="date" placeholder="Fecha final"
+                        class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
+                    </div>
+                  </div>
+                  <div class="mt-2 text-xs text-gray-600 bg-gray-100 p-2 rounded">
+                    💡 Deja vacío para exportar todas las fechas disponibles
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">🏷️ Tipo de caso</label>
+                  <select id="export-type" class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <option value="">🔄 Todos los tipos</option>
+                    <option value="confirmed">🔸 Solo confirmados</option>
+                    <option value="death">🔴 Solo fallecimientos</option>
+                    <option value="recovered">🟢 Solo recuperados</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Columna 3: Vista previa y acciones -->
+              <div class="space-y-4">
+                <div id="export-preview" class="hidden bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-4">
+                  <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                    👀 Vista previa de exportación
+                  </h4>
+                  <div id="preview-content" class="text-sm space-y-2">
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Formato:</span>
+                      <span id="preview-format" class="font-medium">JSON</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">País:</span>
+                      <span id="preview-country" class="font-medium">Todos</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Fechas:</span>
+                      <span id="preview-dates" class="font-medium">Todas</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-gray-600">Tipo:</span>
+                      <span id="preview-type" class="font-medium">Todos</span>
+                    </div>
+                    <hr class="border-blue-300">
+                    <div class="flex justify-between font-semibold">
+                      <span class="text-blue-700">Registros estimados:</span>
+                      <span id="preview-count" class="text-blue-800">Calculando...</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-lg p-4">
+                  <h4 class="font-semibold text-orange-800 mb-3">🚀 Generar archivo</h4>
+                  <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-3 rounded-lg shadow-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                    📥 Generar y Descargar
+                  </button>
+                  <div class="mt-2 text-xs text-center text-orange-700">
+                    El archivo se descargará automáticamente
+                  </div>
+                </div>
+
+                <!-- Estadísticas rápidas -->
+                <div class="bg-gray-50 border rounded-lg p-3">
+                  <h5 class="font-medium text-gray-700 mb-2 text-sm">📊 Estadísticas</h5>
+                  <div class="text-xs space-y-1">
+                    <div class="flex justify-between">
+                      <span>Total registros:</span>
+                      <span class="font-medium" id="stats-total">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Países únicos:</span>
+                      <span class="font-medium" id="stats-countries">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Fechas únicas:</span>
+                      <span class="font-medium" id="stats-dates">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <!-- Sección de exportaciones rápidas mejorada -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h3 class="text-xl font-semibold mb-4 flex items-center">
+              ⚡ Exportaciones Rápidas
+              <span class="ml-2 text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full">Optimizado</span>
+            </h3>
+            
+            <div class="grid md:grid-cols-4 gap-4">
+              <!-- Exportación completa -->
+              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4 text-center">
+                <div class="text-3xl mb-2">🗂️</div>
+                <h4 class="font-semibold text-blue-800 mb-2">Datos Completos</h4>
+                <div class="space-y-2">
+                  <button onclick="quickExport('json', '', '', '', '')" 
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    📄 JSON Completo
+                  </button>
+                  <button onclick="quickExport('excel', '', '', '', '')" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                    📊 Excel Completo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Por países -->
+              <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-4 text-center">
+                <div class="text-3xl mb-2">🌍</div>
+                <h4 class="font-semibold text-green-800 mb-2">Por País</h4>
+                <div class="space-y-2">
+                  <button onclick="quickExport('json', 'colombia', '', '', '')" 
+                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    🇨🇴 Colombia
+                  </button>
+                  <button onclick="quickExport('excel', 'brasil', '', '', '')" 
+                    class="w-full bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    �� Brasil
+                  </button>
+                </div>
+              </div>
+
+              <!-- Por tipo -->
+              <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4 text-center">
+                <div class="text-3xl mb-2">🏷️</div>
+                <h4 class="font-semibold text-purple-800 mb-2">Por Tipo</h4>
+                <div class="space-y-2">
+                  <button onclick="quickExport('excel', '', '', '', 'confirmed')" 
+                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    🔸 Confirmados
+                  </button>
+                  <button onclick="quickExport('json', '', '', '', 'death')" 
+                    class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    🔴 Fallecimientos
+                  </button>
+                </div>
+              </div>
+
+              <!-- Personalizado -->
+              <div class="bg-gradient-to-br from-gray-50 to-slate-50 border-2 border-gray-200 rounded-lg p-4 text-center">
+                <div class="text-3xl mb-2">⚙️</div>
+                <h4 class="font-semibold text-gray-800 mb-2">Personalizado</h4>
+                <div class="space-y-2">
+                  <button onclick="generateCustomExport()" 
+                    class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    🎯 Configurar
+                  </button>
+                  <button onclick="downloadSample()" 
+                    class="w-full bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    � Muestra
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Historial de exportaciones -->
+            <div class="mt-6 bg-gray-50 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                📁 Historial de exportaciones
+                <button onclick="clearExportHistory()" class="ml-auto text-xs text-red-600 hover:text-red-800">
+                  🗑️ Limpiar
+                </button>
+              </h4>
+              <div id="export-history" class="space-y-2">
+                <div class="text-sm text-gray-500 text-center py-2">
+                  No hay exportaciones recientes
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4">ℹ️ Información de Exportación</h2>
+            <div class="space-y-3 text-sm text-gray-600">
+              <div class="p-3 bg-blue-50 rounded-lg">
+                <h4 class="font-medium text-blue-800 mb-1">Formato JSON</h4>
+                <p>Incluye metadatos, filtros aplicados y estructura completa de datos.</p>
+              </div>
+              <div class="p-3 bg-green-50 rounded-lg">
+                <h4 class="font-medium text-green-800 mb-1">Formato CSV</h4>
+                <p>Compatible con Excel y otras aplicaciones de hojas de cálculo.</p>
+              </div>
+              <div class="p-3 bg-yellow-50 rounded-lg">
+                <h4 class="font-medium text-yellow-800 mb-1">Filtros Opcionales</h4>
+                <p>Deja los campos vacíos para exportar todos los registros. Los filtros se combinan con AND lógico.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- TAB: Sistema -->
+      <div id="content-sistema" class="tab-content hidden">
+        <div class="space-y-6">
+          
+          <!-- Información del sistema -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+              ⚙️ Información del Sistema
+              <button onclick="loadSystemInfo()" class="ml-auto text-sm bg-gray-100 text-gray-800 px-3 py-1 rounded hover:bg-gray-200">
+                🔄 Actualizar
+              </button>
+            </h2>
+            <div id="system-info" class="space-y-4">
+              <div class="animate-pulse">Cargando información del sistema...</div>
+            </div>
+          </section>
+
+          <!-- Rendimiento comparativo -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold">🚀 Pruebas de Rendimiento</h2>
+              <button onclick="runAutoBenchmark()" 
+                class="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm">
+                🤖 Demo Automático
+              </button>
+            </div>
+            
+            <!-- Información explicativa -->
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+              <h4 class="font-semibold text-blue-800 mb-2">📚 Comparación de Algoritmos</h4>
+              <div class="grid md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="text-blue-700"><strong>⚡ Búsqueda Hash:</strong></p>
+                  <p class="text-blue-600">• Complejidad: O(1) promedio</p>
+                  <p class="text-blue-600">• Usa índices preconstruidos</p>
+                  <p class="text-blue-600">• Ultra-rápida para búsquedas exactas</p>
+                </div>
+                <div>
+                  <p class="text-purple-700"><strong>🐌 Escaneo Lineal:</strong></p>
+                  <p class="text-purple-600">• Complejidad: O(n)</p>
+                  <p class="text-purple-600">• Recorre todos los registros</p>
+                  <p class="text-purple-600">• Más lento pero universal</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Búsqueda por Fecha -->
+              <div class="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-gray-50 to-blue-50">
+                <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                  📅 Búsqueda por Fecha
+                  <span class="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Campo Único</span>
+                </h3>
+                <form id="form-bench-date" class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Fecha:</label>
+                    <input id="bench-date" type="date" value="1994-11-16" 
+                      class="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" required />
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="benchmarkSearch('date', 'hash')" 
+                      class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                      ⚡ Hash Index
+                    </button>
+                    <button type="button" onclick="benchmarkSearch('date', 'scan')" 
+                      class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                      🐌 Escaneo Lineal
+                    </button>
+                  </div>
+                  <div class="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+                    <strong>Fechas disponibles:</strong> 1994-11-16, 2025-01-15, 2022-04-05, 2023-01-15
+                  </div>
+                </form>
+              </div>
+
+              <!-- Búsqueda por País -->
+              <div class="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-gray-50 to-green-50">
+                <h3 class="font-semibold mb-3 text-gray-800 flex items-center">
+                  🌍 Búsqueda por País
+                  <span class="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Campo Único</span>
+                </h3>
+                <form id="form-bench-country" class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ingresar País:</label>
+                    <div class="relative">
+                      <input id="bench-country" placeholder="Ej: colombia, brasil, argentina..." value="colombia"
+                        class="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all" 
+                        autocomplete="off" required />
+                      <div id="bench-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border rounded-lg mt-1 shadow-lg max-h-48 overflow-y-auto"></div>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="benchmarkSearch('country', 'hash')" 
+                      class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                      ⚡ Hash Index
+                    </button>
+                    <button type="button" onclick="benchmarkSearch('country', 'scan')" 
+                      class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                      🐌 Escaneo Lineal
+                    </button>
+                  </div>
+                  <div class="text-xs text-gray-600 bg-gray-100 p-2 rounded">
+                    <strong>Países disponibles:</strong> Colombia, Brasil, Argentina, España
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Área de resultados -->
+            <div id="benchmark-results" class="mt-6">
+              <div class="text-center py-8 text-gray-500">
+                <div class="text-4xl mb-3">🏁</div>
+                <h4 class="font-semibold text-gray-700 mb-2">Ejecuta tu Primera Prueba</h4>
+                <p class="text-sm">Selecciona una fecha o país y haz clic en "Hash" o "Escaneo" para comparar rendimiento</p>
+                <p class="text-xs mt-2 text-blue-600">💡 Tip: Usa "Demo Automático" para ver todas las comparaciones</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Notificaciones -->
+    <div id="notification-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+    <script src="app.js"></script>
+  </body>
 </html>
