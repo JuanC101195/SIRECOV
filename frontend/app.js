@@ -1370,6 +1370,13 @@ function setupExportForm() {
     const endDate = document.getElementById('export-end').value;
     const type = document.getElementById('export-type').value;
     
+    // Debug: Mostrar formato seleccionado
+    console.log('🔍 Debug exportación:', {
+      format: format,
+      formatElement: formatElement,
+      allFormats: document.querySelectorAll('input[name="format"]')
+    });
+    
     // Validar fechas
     if (startDate && endDate && startDate > endDate) {
       Utils.showNotification('La fecha inicial debe ser anterior a la final', 'error');
@@ -1406,21 +1413,26 @@ function setupExportForm() {
       }
       
       // Obtener el contenido del archivo
-      let content, filename;
+      let content, filename, blob;
       
       if (format === 'json') {
         const data = await response.json();
         content = JSON.stringify(data, null, 2);
         filename = `sirecov_export_${new Date().toISOString().split('T')[0]}.json`;
-      } else {
+        blob = new Blob([content], { type: 'application/json' });
+      } else if (format === 'csv') {
         content = await response.text();
         filename = `sirecov_export_${new Date().toISOString().split('T')[0]}.csv`;
+        blob = new Blob([content], { type: 'text/csv' });
+      } else if (format === 'excel') {
+        // Para Excel, obtener como array buffer
+        const arrayBuffer = await response.arrayBuffer();
+        filename = `sirecov_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+        blob = new Blob([arrayBuffer], { 
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
       }
-      
-      // Crear y descargar el archivo
-      const blob = new Blob([content], { 
-        type: format === 'json' ? 'application/json' : 'text/csv' 
-      });
+      // Crear enlace de descarga
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
@@ -1432,12 +1444,18 @@ function setupExportForm() {
       document.body.removeChild(a);
       
       // Mostrar estadísticas de exportación
-      const stats = format === 'json' && typeof JSON.parse(content) === 'object' ? 
+      const stats = format === 'json' && content && typeof JSON.parse(content) === 'object' ? 
         JSON.parse(content) : null;
       
       let message = `✅ Archivo ${format.toUpperCase()} generado: ${filename}`;
       if (stats && stats.summary) {
         message += ` (${stats.summary.totalRecords} registros)`;
+      } else {
+        // Para Excel, obtener estadísticas del header de respuesta
+        const recordCount = response.headers.get('X-Export-Records');
+        if (recordCount) {
+          message += ` (${recordCount} registros)`;
+        }
       }
       
       Utils.showNotification(message, 'success', 8000);
@@ -2106,14 +2124,17 @@ function toggleExportPreview() {
 // Actualizar selección de formato
 function updateFormatSelection(format) {
   // Resetear estilos
-  document.getElementById('format-json').className = 'format-option border-2 border-gray-300 bg-gray-50 p-4 rounded-lg text-center transition-all hover:border-blue-400';
-  document.getElementById('format-csv').className = 'format-option border-2 border-gray-300 bg-gray-50 p-4 rounded-lg text-center transition-all hover:border-green-400';
+  document.getElementById('format-json').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all hover:border-blue-400';
+  document.getElementById('format-csv').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg text-center transition-all hover:border-gray-400';
+  document.getElementById('format-excel').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all hover:border-green-500';
   
   // Aplicar estilo seleccionado
   if (format === 'json') {
-    document.getElementById('format-json').className = 'format-option selected border-2 border-blue-500 bg-blue-50 p-4 rounded-lg text-center transition-all';
-  } else {
-    document.getElementById('format-csv').className = 'format-option selected border-2 border-green-500 bg-green-50 p-4 rounded-lg text-center transition-all';
+    document.getElementById('format-json').className = 'format-option selected border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all shadow-sm';
+  } else if (format === 'csv') {
+    document.getElementById('format-csv').className = 'format-option selected border-2 border-gray-500 bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg text-center transition-all shadow-sm';
+  } else if (format === 'excel') {
+    document.getElementById('format-excel').className = 'format-option selected border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all shadow-sm';
   }
   
   updateExportPreview();

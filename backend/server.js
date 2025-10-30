@@ -662,13 +662,18 @@ app.get("/export/:format", async (req, res) => {
         compression: true 
       });
 
+      // Configurar cabeceras específicas para Excel
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", `attachment; filename="sirecov_covid_data_${dateForFilename}.xlsx"`);
       res.setHeader("Content-Length", excelBuffer.length);
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
       res.setHeader("X-Export-Records", records.length);
       res.setHeader("X-Export-Format", "Excel");
       
-      return res.send(excelBuffer);
+      // Enviar como buffer binario
+      return res.end(excelBuffer, 'binary');
     }
     
   } catch (err) {
