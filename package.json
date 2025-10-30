@@ -9,6 +9,22 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
-  }
+    "express": "^5.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "main": "simple-test.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuanC101195/SIRECOV.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JuanC101195/SIRECOV/issues"
+  },
+  "homepage": "https://github.com/JuanC101195/SIRECOV#readme"
 }
