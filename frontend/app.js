@@ -2123,19 +2123,36 @@ function toggleExportPreview() {
 
 // Actualizar selección de formato
 function updateFormatSelection(format) {
-  // Resetear estilos
-  document.getElementById('format-json').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all hover:border-blue-400';
-  document.getElementById('format-csv').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg text-center transition-all hover:border-gray-400';
-  document.getElementById('format-excel').className = 'format-option border-2 border-gray-300 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all hover:border-green-500';
+  console.log('🎯 Formato seleccionado:', format);
+  
+  // Resetear estilos - todos los formatos
+  document.getElementById('format-json').className = 'format-option border-3 border-gray-300 bg-white hover:border-blue-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
+  document.getElementById('format-csv').className = 'format-option border-3 border-gray-300 bg-white hover:border-orange-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
+  document.getElementById('format-excel').className = 'format-option border-3 border-gray-300 bg-white hover:border-green-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
   
   // Aplicar estilo seleccionado
   if (format === 'json') {
-    document.getElementById('format-json').className = 'format-option selected border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all shadow-sm';
+    document.getElementById('format-json').className = 'format-option selected border-3 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
+    document.getElementById('download-button-text').textContent = 'Descargar JSON';
   } else if (format === 'csv') {
-    document.getElementById('format-csv').className = 'format-option selected border-2 border-gray-500 bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg text-center transition-all shadow-sm';
+    document.getElementById('format-csv').className = 'format-option selected border-3 border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
+    document.getElementById('download-button-text').textContent = 'Descargar CSV';
   } else if (format === 'excel') {
-    document.getElementById('format-excel').className = 'format-option selected border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all shadow-sm';
+    document.getElementById('format-excel').className = 'format-option selected border-3 border-green-500 bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
+    document.getElementById('download-button-text').textContent = 'Descargar Excel';
   }
+  
+  // Mostrar secciones de filtros y descarga
+  document.getElementById('filters-section').style.display = 'block';
+  document.getElementById('download-section').style.display = 'block';
+  
+  // Scroll suave a los filtros
+  setTimeout(() => {
+    document.getElementById('filters-section').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }, 100);
   
   updateExportPreview();
 }

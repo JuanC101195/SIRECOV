@@ -46,6 +46,11 @@
         perspective: 1000px;
       }
       
+      /* Bordes de 3px para elementos de formato */
+      .border-3 {
+        border-width: 3px;
+      }
+      
       /* Mejorar botones y elementos interactivos */
       button, input, select {
         transform: translateZ(0);
@@ -622,54 +627,65 @@
               </div>
             </div>
             
-            <form id="form-export" class="grid md:grid-cols-3 gap-6">
-              <!-- Columna 1: Formato y configuración básica -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    📄 Formato de archivo
-                    <span class="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Requerido</span>
+            <!-- PASO 1: SELECCIÓN DE FORMATO (PRINCIPAL) -->
+            <div class="bg-white border-2 border-blue-200 rounded-xl p-6 mb-6">
+              <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">1</span>
+                📄 Selecciona el formato de archivo
+              </h3>
+              
+              <form id="form-export">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <label class="relative cursor-pointer group">
+                    <input type="radio" name="format" value="json" class="sr-only" onchange="updateFormatSelection('json')">
+                    <div id="format-json" class="format-option border-3 border-gray-300 bg-white hover:border-blue-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105">
+                      <div class="text-4xl mb-3">📄</div>
+                      <div class="font-bold text-lg text-gray-800">JSON</div>
+                      <div class="text-sm text-gray-600 mt-2">Datos completos con metadatos</div>
+                      <div class="text-xs text-gray-500 mt-1">Para desarrolladores</div>
+                    </div>
                   </label>
-                  <div class="grid grid-cols-3 gap-3">
-                    <label class="relative cursor-pointer">
-                      <input type="radio" name="format" value="json" class="sr-only" checked onchange="updateFormatSelection('json')">
-                      <div id="format-json" class="format-option selected border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg text-center transition-all shadow-sm">
-                        <div class="text-3xl mb-2">📄</div>
-                        <div class="font-semibold text-blue-800">JSON</div>
-                        <div class="text-xs text-blue-600 mt-1">Datos + Metadatos</div>
-                        <div class="text-xs text-blue-500 mt-1">Estructura completa</div>
-                      </div>
-                    </label>
-                    <label class="relative cursor-pointer">
-                      <input type="radio" name="format" value="csv" class="sr-only" onchange="updateFormatSelection('csv')">
-                      <div id="format-csv" class="format-option border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50 p-4 rounded-lg text-center transition-all hover:border-gray-400 shadow-sm">
-                        <div class="text-3xl mb-2">📋</div>
-                        <div class="font-semibold text-gray-700">CSV</div>
-                        <div class="text-xs text-gray-600 mt-1">Hoja de cálculo</div>
-                        <div class="text-xs text-gray-500 mt-1">Compatible Excel</div>
-                      </div>
-                    </label>
-                    <label class="relative cursor-pointer">
-                      <input type="radio" name="format" value="excel" class="sr-only" onchange="updateFormatSelection('excel')">
-                      <div id="format-excel" class="format-option border-2 border-gray-300 bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg text-center transition-all hover:border-green-500 shadow-sm">
-                        <div class="text-3xl mb-2">📊</div>
-                        <div class="font-semibold text-gray-700">Excel</div>
-                        <div class="text-xs text-green-600 mt-1">Múltiples hojas</div>
-                        <div class="text-xs text-green-500 mt-1">Estadísticas incluidas</div>
-                      </div>
-                    </label>
-                  </div>
+                  
+                  <label class="relative cursor-pointer group">
+                    <input type="radio" name="format" value="csv" class="sr-only" onchange="updateFormatSelection('csv')">
+                    <div id="format-csv" class="format-option border-3 border-gray-300 bg-white hover:border-orange-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105">
+                      <div class="text-4xl mb-3">📋</div>
+                      <div class="font-bold text-lg text-gray-800">CSV</div>
+                      <div class="text-sm text-gray-600 mt-2">Tabla simple y limpia</div>
+                      <div class="text-xs text-gray-500 mt-1">Compatible con Excel</div>
+                    </div>
+                  </label>
+                  
+                  <label class="relative cursor-pointer group">
+                    <input type="radio" name="format" value="excel" class="sr-only" onchange="updateFormatSelection('excel')">
+                    <div id="format-excel" class="format-option border-3 border-gray-300 bg-white hover:border-green-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105">
+                      <div class="text-4xl mb-3">📊</div>
+                      <div class="font-bold text-lg text-gray-800">EXCEL</div>
+                      <div class="text-sm text-gray-600 mt-2">Múltiples hojas con estadísticas</div>
+                      <div class="text-xs text-gray-500 mt-1">Análisis profesional</div>
+                    </div>
+                  </label>
                 </div>
-
+              </form>
+            </div>
+            
+            <!-- PASO 2: FILTROS (SECUNDARIO) -->
+            <div id="filters-section" class="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 mb-6" style="display: none;">
+              <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                <span class="bg-gray-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-3">2</span>
+                🎯 Filtros opcionales (dejar vacío = todos los datos)
+              </h3>
+              
+              <div class="grid md:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">🌍 País (opcional)</label>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">🌍 País</label>
                   <div class="relative">
-                    <input id="export-country" placeholder="Ej: colombia, brasil..." 
+                    <input id="export-country" placeholder="Vacío = todos los países" 
                       class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" 
                       autocomplete="off" />
                     <div id="export-autocomplete-dropdown" class="hidden absolute z-10 w-full bg-white border-2 rounded-lg mt-1 shadow-xl max-h-48 overflow-y-auto"></div>
                   </div>
-                  <div class="mt-2 flex flex-wrap gap-2">
+                  <div class="mt-2 flex flex-wrap gap-1">
                     <button type="button" onclick="setExportCountry('colombia')" class="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full transition-colors">
                       🇨🇴 Colombia
                     </button>
@@ -681,190 +697,81 @@
                     </button>
                   </div>
                 </div>
-              </div>
-
-              <!-- Columna 2: Filtros de fecha y tipo -->
-              <div class="space-y-4">
+                
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    📅 Rango de fechas
-                    <span class="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Opcional</span>
-                  </label>
-                  <div class="space-y-3">
-                    <div>
-                      <input id="export-start" type="date" placeholder="Fecha inicial" 
-                        class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
-                    </div>
-                    <div>
-                      <input id="export-end" type="date" placeholder="Fecha final"
-                        class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" />
-                    </div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">📅 Rango de fechas</label>
+                  <div class="space-y-2">
+                    <input 
+                      id="export-start" 
+                      type="date" 
+                      class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    />
+                    <input 
+                      id="export-end" 
+                      type="date" 
+                      class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    />
                   </div>
-                  <div class="mt-2 text-xs text-gray-600 bg-gray-100 p-2 rounded">
-                    💡 Deja vacío para exportar todas las fechas disponibles
-                  </div>
+                  <div class="text-xs text-gray-500 mt-1">Vacío = todas las fechas</div>
                 </div>
-
+                
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">🏷️ Tipo de caso</label>
-                  <select id="export-type" class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                    <option value="">🔄 Todos los tipos</option>
-                    <option value="confirmed">🔸 Solo confirmados</option>
-                    <option value="death">🔴 Solo fallecimientos</option>
-                    <option value="recovered">🟢 Solo recuperados</option>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">🏷️ Tipo de caso</label>
+                  <select id="export-type" class="border-2 border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
+                    <option value="">🌐 Todos los tipos</option>
+                    <option value="confirmed">✅ Confirmados</option>
+                    <option value="death">� Fallecimientos</option>
+                    <option value="recovered">� Recuperados</option>
                   </select>
-                </div>
-              </div>
-
-              <!-- Columna 3: Vista previa y acciones -->
-              <div class="space-y-4">
-                <div id="export-preview" class="hidden bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-4">
-                  <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
-                    👀 Vista previa de exportación
-                  </h4>
-                  <div id="preview-content" class="text-sm space-y-2">
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Formato:</span>
-                      <span id="preview-format" class="font-medium">JSON</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">País:</span>
-                      <span id="preview-country" class="font-medium">Todos</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Fechas:</span>
-                      <span id="preview-dates" class="font-medium">Todas</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Tipo:</span>
-                      <span id="preview-type" class="font-medium">Todos</span>
-                    </div>
-                    <hr class="border-blue-300">
-                    <div class="flex justify-between font-semibold">
-                      <span class="text-blue-700">Registros estimados:</span>
-                      <span id="preview-count" class="text-blue-800">Calculando...</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-lg p-4">
-                  <h4 class="font-semibold text-orange-800 mb-3">🚀 Generar archivo</h4>
-                  <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-4 py-3 rounded-lg shadow-lg font-semibold transition-all duration-200 transform hover:scale-105">
-                    📥 Generar y Descargar
-                  </button>
-                  <div class="mt-2 text-xs text-center text-orange-700">
-                    El archivo se descargará automáticamente
-                  </div>
-                </div>
-
-                <!-- Estadísticas rápidas -->
-                <div class="bg-gray-50 border rounded-lg p-3">
-                  <h5 class="font-medium text-gray-700 mb-2 text-sm">📊 Estadísticas</h5>
-                  <div class="text-xs space-y-1">
-                    <div class="flex justify-between">
-                      <span>Total registros:</span>
-                      <span class="font-medium" id="stats-total">-</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span>Países únicos:</span>
-                      <span class="font-medium" id="stats-countries">-</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span>Fechas únicas:</span>
-                      <span class="font-medium" id="stats-dates">-</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </section>
-
-          <!-- Sección de exportaciones rápidas mejorada -->
-          <section class="bg-white rounded-xl p-6 shadow-sm border">
-            <h3 class="text-xl font-semibold mb-4 flex items-center">
-              ⚡ Exportaciones Rápidas
-              <span class="ml-2 text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full">Optimizado</span>
-            </h3>
-            
-            <div class="grid md:grid-cols-4 gap-4">
-              <!-- Exportación completa -->
-              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4 text-center">
-                <div class="text-3xl mb-2">🗂️</div>
-                <h4 class="font-semibold text-blue-800 mb-2">Datos Completos</h4>
-                <div class="space-y-2">
-                  <button onclick="quickExport('json', '', '', '', '')" 
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                    📄 JSON Completo
-                  </button>
-                  <button onclick="quickExport('excel', '', '', '', '')" 
-                    class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
-                    📊 Excel Completo
-                  </button>
-                </div>
-              </div>
-
-              <!-- Por países -->
-              <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-4 text-center">
-                <div class="text-3xl mb-2">🌍</div>
-                <h4 class="font-semibold text-green-800 mb-2">Por País</h4>
-                <div class="space-y-2">
-                  <button onclick="quickExport('json', 'colombia', '', '', '')" 
-                    class="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    🇨🇴 Colombia
-                  </button>
-                  <button onclick="quickExport('excel', 'brasil', '', '', '')" 
-                    class="w-full bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    �� Brasil
-                  </button>
-                </div>
-              </div>
-
-              <!-- Por tipo -->
-              <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4 text-center">
-                <div class="text-3xl mb-2">🏷️</div>
-                <h4 class="font-semibold text-purple-800 mb-2">Por Tipo</h4>
-                <div class="space-y-2">
-                  <button onclick="quickExport('excel', '', '', '', 'confirmed')" 
-                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    🔸 Confirmados
-                  </button>
-                  <button onclick="quickExport('json', '', '', '', 'death')" 
-                    class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    🔴 Fallecimientos
-                  </button>
-                </div>
-              </div>
-
-              <!-- Personalizado -->
-              <div class="bg-gradient-to-br from-gray-50 to-slate-50 border-2 border-gray-200 rounded-lg p-4 text-center">
-                <div class="text-3xl mb-2">⚙️</div>
-                <h4 class="font-semibold text-gray-800 mb-2">Personalizado</h4>
-                <div class="space-y-2">
-                  <button onclick="generateCustomExport()" 
-                    class="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    🎯 Configurar
-                  </button>
-                  <button onclick="downloadSample()" 
-                    class="w-full bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    � Muestra
-                  </button>
                 </div>
               </div>
             </div>
             
-            <!-- Historial de exportaciones -->
-            <div class="mt-6 bg-gray-50 rounded-lg p-4">
-              <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
-                📁 Historial de exportaciones
-                <button onclick="clearExportHistory()" class="ml-auto text-xs text-red-600 hover:text-red-800">
-                  🗑️ Limpiar
-                </button>
-              </h4>
-              <div id="export-history" class="space-y-2">
-                <div class="text-sm text-gray-500 text-center py-2">
-                  No hay exportaciones recientes
-                </div>
+            <!-- PASO 3: BOTÓN DE DESCARGA -->
+            <div id="download-section" class="text-center" style="display: none;">
+              <button type="submit" form="form-export" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <span class="mr-3 text-2xl">⬇️</span>
+                <span id="download-button-text">Descargar archivo</span>
+              </button>
+              <div class="mt-3 text-sm text-gray-600">
+                El archivo se descargará automáticamente
               </div>
+            </div>
+          </section>
+
+          <!-- Información de ayuda -->
+          <section class="bg-white rounded-xl p-6 shadow-sm border">
+            <h3 class="text-xl font-semibold mb-4 flex items-center">
+              ℹ️ Información sobre los formatos
+            </h3>
+            
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                  📄 JSON
+                </h4>
+                <p class="text-sm text-blue-700">Datos completos con metadatos, estadísticas y estructura detallada. Ideal para desarrolladores.</p>
+              </div>
+              
+              <div class="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                <h4 class="font-semibold text-orange-800 mb-2 flex items-center">
+                  📋 CSV
+                </h4>
+                <p class="text-sm text-orange-700">Tabla simple y limpia. Compatible con Excel, Google Sheets y otras aplicaciones.</p>
+              </div>
+              
+              <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                <h4 class="font-semibold text-green-800 mb-2 flex items-center">
+                  � Excel
+                </h4>
+                <p class="text-sm text-green-700">Archivo .xlsx profesional con múltiples hojas, gráficos y estadísticas avanzadas.</p>
+              </div>
+            </div>
+            
+            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p class="text-sm text-gray-600">
+                💡 <strong>Consejo:</strong> Todos los filtros son opcionales. Deja los campos vacíos para descargar todos los datos disponibles.
+              </p>
             </div>
           </section>
 
