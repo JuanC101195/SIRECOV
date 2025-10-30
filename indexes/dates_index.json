@@ -1,0 +1,106 @@
+{
+  "metadata": {
+    "indexName": "dates",
+    "createdAt": "2025-10-30T18:38:47.007Z",
+    "recordCount": 8,
+    "totalSize": 752
+  },
+  "index": {
+    "1994-11-16": {
+      "positions": [
+        0
+      ],
+      "totalCases": 1988,
+      "countries": [
+        "colombia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-01-15": {
+      "positions": [
+        1
+      ],
+      "totalCases": 154,
+      "countries": [
+        "argentina"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-02-01": {
+      "positions": [
+        2
+      ],
+      "totalCases": 125,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2025-01-15": {
+      "positions": [
+        3
+      ],
+      "totalCases": 22,
+      "countries": [
+        "colombia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2023-06-12": {
+      "positions": [
+        4
+      ],
+      "totalCases": 28,
+      "countries": [
+        "colombia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "1994-04-05": {
+      "positions": [
+        5
+      ],
+      "totalCases": 25,
+      "countries": [
+        "colombia"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-01-30": {
+      "positions": [
+        6
+      ],
+      "totalCases": 125,
+      "countries": [
+        "Colombia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2025-10-11": {
+      "positions": [
+        7
+      ],
+      "totalCases": 60,
+      "countries": [
+        "Filipinas"
+      ],
+      "types": [
+        "death"
+      ]
+    }
+  }
+}

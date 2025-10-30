@@ -6,71 +6,61 @@ const { buildKey } = require("./validator");
 const DATA_PATH = path.resolve(__dirname, "..", "data", "covid_records.txt");
 const HEADER = "country,date,type,cases\n";
 
-// Convierte objeto -> línea CSV
 function toCSV({ country, date, type, cases }) {
-  // NOTA: si country pudiera tener comas, se debería entrecomillar/escapar.
   return `${country},${date},${type},${cases}`;
 }
 
-// Convierte línea CSV -> objeto  (devuelve null si está mal o si es la cabecera)
 function fromCSV(line) {
-  const raw = line.trim();
-  if (!raw || raw.toLowerCase() === "country,date,type,cases") return null;
-  const parts = raw.split(",");
+  if (!line) return null;
+  const trimmed = line.trim();
+  if (!trimmed || trimmed === "country,date,type,cases") return null;
+  const parts = trimmed.split(",");
   if (parts.length !== 4) return null;
-  const [country, date, type, casesStr] = parts;
-  const n = Number(casesStr);
-  if (!Number.isInteger(n) || n < 0) return null;
-  return { country, date, type, cases: n };
+  const [country, date, type, casesRaw] = parts;
+  const cases = Number(casesRaw);
+  if (!Number.isFinite(cases)) return null;
+  return { country, date, type, cases };
 }
 
 async function ensureFileWithHeader() {
+  await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
   try {
-    const txt = await fs.readFile(DATA_PATH, "utf8");
-    if (!txt.startsWith("country,date,type,cases")) {
-      await fs.writeFile(DATA_PATH, HEADER + txt, "utf8");
-    }
-  } catch (e) {
-    if (e.code === "ENOENT") {
-      await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
-      await fs.writeFile(DATA_PATH, HEADER, "utf8");
-    } else {
-      throw e;
-    }
+    await fs.access(DATA_PATH);
+  } catch {
+    await fs.writeFile(DATA_PATH, HEADER, "utf8");
   }
+}
+
+async function appendRecordCSV(rec) {
+  await fs.appendFile(DATA_PATH, toCSV(rec) + "\n", "utf8");
 }
 
 async function readAllCSV() {
   await ensureFileWithHeader();
-  const txt = await fs.readFile(DATA_PATH, "utf8");
-  return txt
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map(fromCSV)
-    .filter(Boolean);
-}
-
-async function appendRecordCSV(record) {
-  await ensureFileWithHeader();
-  const line = toCSV(record) + "\n";
-  await fs.appendFile(DATA_PATH, line, "utf8");
+  const data = await fs.readFile(DATA_PATH, "utf8");
+  const lines = data.split(/\r?\n/);
+  const out = [];
+  for (const ln of lines) {
+    const r = fromCSV(ln);
+    if (r) out.push(r);
+  }
+  return out;
 }
 
 async function existsKeyCSV(key) {
   const all = await readAllCSV();
-  return all.some((r) => buildKey(r) === key);
+  return all.some(r => buildKey(r) === key);
 }
 
 async function findByKeyCSV(key) {
   const all = await readAllCSV();
-  return all.find((r) => buildKey(r) === key) || null;
+  return all.find(r => buildKey(r) === key) || null;
 }
 
 module.exports = {
   appendRecordCSV,
-  existsKeyCSV,
   findByKeyCSV,
+  existsKeyCSV,
   readAllCSV,
   ensureFileWithHeader,
   DATA_PATH,

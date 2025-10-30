@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "indexName": "types",
+    "createdAt": "2025-10-30T18:38:47.008Z",
+    "recordCount": 2,
+    "totalSize": 233
+  },
+  "index": {
+    "confirmed": {
+      "name": "confirmed",
+      "positions": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "totalCases": 2442,
+      "countries": [
+        "colombia",
+        "argentina",
+        "alemania",
+        "Colombia"
+      ]
+    },
+    "death": {
+      "name": "death",
+      "positions": [
+        5,
+        7
+      ],
+      "totalCases": 85,
+      "countries": [
+        "colombia",
+        "Filipinas"
+      ]
+    }
+  }
+}

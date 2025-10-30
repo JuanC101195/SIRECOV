@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "indexName": "countries",
+    "createdAt": "2025-10-30T18:38:47.006Z",
+    "recordCount": 4,
+    "totalSize": 373
+  },
+  "index": {
+    "colombia": {
+      "name": "colombia",
+      "positions": [
+        0,
+        3,
+        4,
+        5,
+        6
+      ],
+      "totalCases": 2188,
+      "lastUpdate": "2025-01-15"
+    },
+    "argentina": {
+      "name": "argentina",
+      "positions": [
+        1
+      ],
+      "totalCases": 154,
+      "lastUpdate": "2020-01-15"
+    },
+    "alemania": {
+      "name": "alemania",
+      "positions": [
+        2
+      ],
+      "totalCases": 125,
+      "lastUpdate": "2020-02-01"
+    },
+    "filipinas": {
+      "name": "Filipinas",
+      "positions": [
+        7
+      ],
+      "totalCases": 60,
+      "lastUpdate": "2025-10-11"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test de Exportación SIRECOV</title>
+</head>
+<body>
+    <h1>🧪 Test Directo de Exportación</h1>
+    
+    <div>
+        <h3>Test 1: Descarga JSON</h3>
+        <button onclick="testDirectExport('json')">📄 Descargar JSON</button>
+    </div>
+    
+    <div>
+        <h3>Test 2: Descarga CSV</h3>
+        <button onclick="testDirectExport('csv')">📊 Descargar CSV</button>
+    </div>
+    
+    <div>
+        <h3>Test 3: JSON con Filtros</h3>
+        <button onclick="testFilteredExport('json', 'colombia')">🇨🇴 JSON Colombia</button>
+    </div>
+    
+    <div id="results" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+        <strong>Resultados aparecerán aquí...</strong>
+    </div>
+
+    <script>
+        console.log('🧪 Test de exportación inicializado');
+        
+        async function testDirectExport(format) {
+            const results = document.getElementById('results');
+            results.innerHTML = `🔄 Descargando ${format.toUpperCase()}...`;
+            
+            try {
+                const response = await fetch(`http://localhost:3000/export/${format}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                let content, filename, mimeType;
+                
+                if (format === 'json') {
+                    const data = await response.json();
+                    content = JSON.stringify(data, null, 2);
+                    filename = `test_export_${Date.now()}.json`;
+                    mimeType = 'application/json';
+                    
+                    results.innerHTML = `✅ JSON descargado: ${data.totalRecords} registros`;
+                } else {
+                    content = await response.text();
+                    filename = `test_export_${Date.now()}.csv`;
+                    mimeType = 'text/csv';
+                    
+                    const lines = content.split('\\n').length - 1;
+                    results.innerHTML = `✅ CSV descargado: ${lines} líneas`;
+                }
+                
+                // Crear y descargar archivo
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                results.innerHTML = `❌ Error: ${error.message}`;
+                console.error('Error en test:', error);
+            }
+        }
+        
+        async function testFilteredExport(format, country) {
+            const results = document.getElementById('results');
+            results.innerHTML = `🔄 Descargando ${format.toUpperCase()} filtrado por ${country}...`;
+            
+            try {
+                const response = await fetch(`http://localhost:3000/export/${format}?country=${country}`);
+                const data = await response.json();
+                
+                results.innerHTML = `✅ Filtrado descargado: ${data.totalRecords} registros de ${country}`;
+                
+                const content = JSON.stringify(data, null, 2);
+                const blob = new Blob([content], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${country}_export_${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+            } catch (error) {
+                results.innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
