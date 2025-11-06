@@ -237,17 +237,23 @@
                   <div class="border-l-4 border-green-400 bg-green-50 p-3 rounded-r">
                     <div class="text-xs font-medium text-green-800 mb-2">✅ Registros Existentes</div>
                     <div class="grid gap-2">
-                      <button onclick="fillExample('colombia', '1994-11-16', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
-                        🇨🇴 Colombia • 16/11/1994 • Confirmados (1,988 casos)
+                      <button onclick="fillExample('colombia', '2020-03-15', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇨🇴 Colombia • 15/03/2020 • Confirmados (2,456 casos)
                       </button>
-                      <button onclick="fillExample('colombia', '2025-01-15', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
-                        🇨🇴 Colombia • 15/01/2025 • Confirmados (22 casos)
+                      <button onclick="fillExample('brasil', '2020-02-26', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        �� Brasil • 26/02/2020 • Confirmados (3,245 casos)
                       </button>
-                      <button onclick="fillExample('argentina', '2020-01-15', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
-                        🇦🇷 Argentina • 15/01/2020 • Confirmados (154 casos)
+                      <button onclick="fillExample('espana', '2020-05-20', 'recovered')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇪🇸 España • 20/05/2020 • Recuperados (1,789 casos)
                       </button>
-                      <button onclick="fillExample('colombia', '1994-04-05', 'death')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
-                        🇨🇴 Colombia • 05/04/1994 • Fallecimientos (25 casos)
+                      <button onclick="fillExample('argentina', '2020-02-28', 'death')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇦🇷 Argentina • 28/02/2020 • Fallecimientos (45 casos)
+                      </button>
+                      <button onclick="fillExample('alemania', '2021-01-30', 'confirmed')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        �� Alemania • 30/01/2021 • Confirmados (3,234 casos)
+                      </button>
+                      <button onclick="fillExample('mexico', '2020-07-11', 'recovered')" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded transition-colors text-left text-xs">
+                        🇲🇽 México • 11/07/2020 • Recuperados (1,234 casos)
                       </button>
                     </div>
                   </div>
@@ -422,14 +428,20 @@
                   <button onclick="quickSearchCountry('colombia')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
                     🇨🇴 Colombia
                   </button>
-                  <button onclick="quickSearchCountry('brazil')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
-                    🇧🇷 Brazil
+                  <button onclick="quickSearchCountry('brasil')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇧🇷 Brasil
                   </button>
-                  <button onclick="quickSearchCountry('peru')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
-                    🇵🇪 Peru
+                  <button onclick="quickSearchCountry('espana')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇸 España
                   </button>
                   <button onclick="quickSearchCountry('argentina')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
                     🇦🇷 Argentina
+                  </button>
+                  <button onclick="quickSearchCountry('alemania')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇩🇪 Alemania
+                  </button>
+                  <button onclick="quickSearchCountry('mexico')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-2 rounded transition-colors">
+                    🇲🇽 México
                   </button>
                 </div>
               </div>
@@ -459,12 +471,18 @@
               <!-- Ejemplos rápidos -->
               <div class="mt-6 p-4 bg-gray-50 rounded-lg border">
                 <h4 class="font-medium text-gray-700 mb-3">🚀 Fechas de Ejemplo</h4>
-                <div class="grid grid-cols-1 gap-2 text-xs">
-                  <button onclick="quickSearchDate('2022-03-15')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
-                    📅 2022-03-15
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <button onclick="quickSearchDate('2020-03-15')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2020-03-15
                   </button>
-                  <button onclick="quickSearchDate('2022-06-30')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
-                    📅 2022-06-30
+                  <button onclick="quickSearchDate('2021-07-10')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2021-07-10
+                  </button>
+                  <button onclick="quickSearchDate('2020-05-20')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2020-05-20
+                  </button>
+                  <button onclick="quickSearchDate('2022-01-08')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-2 rounded transition-colors">
+                    📅 2022-01-08
                   </button>
                 </div>
               </div>

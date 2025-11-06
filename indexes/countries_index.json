@@ -1,46 +1,130 @@
 {
   "metadata": {
     "indexName": "countries",
-    "createdAt": "2025-11-06T14:21:36.811Z",
-    "recordCount": 4,
-    "totalSize": 373
+    "createdAt": "2025-11-06T15:03:45.113Z",
+    "recordCount": 10,
+    "totalSize": 1002
   },
   "index": {
     "colombia": {
       "name": "colombia",
       "positions": [
         0,
+        1,
+        2,
         3,
-        4,
-        5,
-        6
+        4
       ],
-      "totalCases": 2188,
-      "lastUpdate": "2025-01-15"
+      "totalCases": 7679,
+      "lastUpdate": "2021-07-11"
     },
     "argentina": {
       "name": "argentina",
       "positions": [
-        1
+        5,
+        6,
+        7,
+        8,
+        9
       ],
-      "totalCases": 154,
-      "lastUpdate": "2020-01-15"
+      "totalCases": 6119,
+      "lastUpdate": "2022-01-08"
+    },
+    "brasil": {
+      "name": "brasil",
+      "positions": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "totalCases": 10453,
+      "lastUpdate": "2021-08-14"
+    },
+    "mexico": {
+      "name": "mexico",
+      "positions": [
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "totalCases": 6458,
+      "lastUpdate": "2022-02-15"
+    },
+    "espana": {
+      "name": "espana",
+      "positions": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "totalCases": 7633,
+      "lastUpdate": "2021-09-25"
+    },
+    "francia": {
+      "name": "francia",
+      "positions": [
+        25,
+        26,
+        27,
+        28,
+        29
+      ],
+      "totalCases": 6457,
+      "lastUpdate": "2021-11-05"
     },
     "alemania": {
       "name": "alemania",
       "positions": [
-        2
+        30,
+        31,
+        32,
+        33,
+        34
       ],
-      "totalCases": 125,
-      "lastUpdate": "2020-02-01"
+      "totalCases": 6792,
+      "lastUpdate": "2021-08-22"
     },
-    "filipinas": {
-      "name": "Filipinas",
+    "italia": {
+      "name": "italia",
       "positions": [
-        7
+        35,
+        36,
+        37,
+        38,
+        39
       ],
-      "totalCases": 60,
-      "lastUpdate": "2025-10-11"
+      "totalCases": 7988,
+      "lastUpdate": "2022-01-12"
+    },
+    "chile": {
+      "name": "chile",
+      "positions": [
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "totalCases": 4623,
+      "lastUpdate": "2022-03-10"
+    },
+    "peru": {
+      "name": "peru",
+      "positions": [
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "totalCases": 5442,
+      "lastUpdate": "2021-12-15"
     }
   }
 }

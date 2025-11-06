@@ -1,76 +1,31 @@
 {
   "metadata": {
     "indexName": "dates",
-    "createdAt": "2025-11-06T14:21:36.812Z",
-    "recordCount": 8,
-    "totalSize": 752
+    "createdAt": "2025-11-06T15:03:45.116Z",
+    "recordCount": 47,
+    "totalSize": 4453
   },
   "index": {
-    "1994-11-16": {
+    "2020-03-15": {
       "positions": [
-        0
+        0,
+        21
       ],
-      "totalCases": 1988,
+      "totalCases": 2612,
       "countries": [
-        "colombia"
+        "colombia",
+        "espana"
       ],
       "types": [
-        "confirmed"
+        "confirmed",
+        "death"
       ]
     },
-    "2020-01-15": {
+    "2020-03-16": {
       "positions": [
         1
       ],
-      "totalCases": 154,
-      "countries": [
-        "argentina"
-      ],
-      "types": [
-        "confirmed"
-      ]
-    },
-    "2020-02-01": {
-      "positions": [
-        2
-      ],
-      "totalCases": 125,
-      "countries": [
-        "alemania"
-      ],
-      "types": [
-        "confirmed"
-      ]
-    },
-    "2025-01-15": {
-      "positions": [
-        3
-      ],
-      "totalCases": 22,
-      "countries": [
-        "colombia"
-      ],
-      "types": [
-        "confirmed"
-      ]
-    },
-    "2023-06-12": {
-      "positions": [
-        4
-      ],
-      "totalCases": 28,
-      "countries": [
-        "colombia"
-      ],
-      "types": [
-        "confirmed"
-      ]
-    },
-    "1994-04-05": {
-      "positions": [
-        5
-      ],
-      "totalCases": 25,
+      "totalCases": 87,
       "countries": [
         "colombia"
       ],
@@ -78,25 +33,546 @@
         "death"
       ]
     },
-    "2020-01-30": {
+    "2020-04-20": {
       "positions": [
-        6
+        2
       ],
-      "totalCases": 125,
+      "totalCases": 1205,
       "countries": [
-        "Colombia"
+        "colombia"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-07-10": {
+      "positions": [
+        3
+      ],
+      "totalCases": 3789,
+      "countries": [
+        "colombia"
       ],
       "types": [
         "confirmed"
       ]
     },
-    "2025-10-11": {
+    "2021-07-11": {
+      "positions": [
+        4
+      ],
+      "totalCases": 142,
+      "countries": [
+        "colombia"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-01-15": {
+      "positions": [
+        5
+      ],
+      "totalCases": 1854,
+      "countries": [
+        "argentina"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-02-28": {
+      "positions": [
+        6,
+        15
+      ],
+      "totalCases": 1723,
+      "countries": [
+        "argentina",
+        "mexico"
+      ],
+      "types": [
+        "death",
+        "confirmed"
+      ]
+    },
+    "2020-05-12": {
       "positions": [
         7
       ],
-      "totalCases": 60,
+      "totalCases": 987,
       "countries": [
-        "Filipinas"
+        "argentina"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-06-15": {
+      "positions": [
+        8
+      ],
+      "totalCases": 2341,
+      "countries": [
+        "argentina"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2022-01-08": {
+      "positions": [
+        9
+      ],
+      "totalCases": 892,
+      "countries": [
+        "argentina"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-02-26": {
+      "positions": [
+        10
+      ],
+      "totalCases": 3245,
+      "countries": [
+        "brasil"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-03-10": {
+      "positions": [
+        11
+      ],
+      "totalCases": 198,
+      "countries": [
+        "brasil"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-06-18": {
+      "positions": [
+        12
+      ],
+      "totalCases": 2156,
+      "countries": [
+        "brasil"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-05-22": {
+      "positions": [
+        13
+      ],
+      "totalCases": 4567,
+      "countries": [
+        "brasil"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2021-08-14": {
+      "positions": [
+        14
+      ],
+      "totalCases": 287,
+      "countries": [
+        "brasil"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-04-05": {
+      "positions": [
+        16
+      ],
+      "totalCases": 89,
+      "countries": [
+        "mexico"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-07-11": {
+      "positions": [
+        17
+      ],
+      "totalCases": 1234,
+      "countries": [
+        "mexico"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-03-20": {
+      "positions": [
+        18
+      ],
+      "totalCases": 2890,
+      "countries": [
+        "mexico"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2022-02-15": {
+      "positions": [
+        19
+      ],
+      "totalCases": 567,
+      "countries": [
+        "mexico"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-01-31": {
+      "positions": [
+        20,
+        35
+      ],
+      "totalCases": 4479,
+      "countries": [
+        "espana",
+        "italia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-05-20": {
+      "positions": [
+        22
+      ],
+      "totalCases": 1789,
+      "countries": [
+        "espana"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-04-10": {
+      "positions": [
+        23
+      ],
+      "totalCases": 3456,
+      "countries": [
+        "espana"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2021-09-25": {
+      "positions": [
+        24
+      ],
+      "totalCases": 98,
+      "countries": [
+        "espana"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-01-24": {
+      "positions": [
+        25
+      ],
+      "totalCases": 1567,
+      "countries": [
+        "francia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-03-08": {
+      "positions": [
+        26
+      ],
+      "totalCases": 78,
+      "countries": [
+        "francia"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-06-12": {
+      "positions": [
+        27
+      ],
+      "totalCases": 1345,
+      "countries": [
+        "francia"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-02-18": {
+      "positions": [
+        28
+      ],
+      "totalCases": 2789,
+      "countries": [
+        "francia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2021-11-05": {
+      "positions": [
+        29
+      ],
+      "totalCases": 678,
+      "countries": [
+        "francia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-01-27": {
+      "positions": [
+        30
+      ],
+      "totalCases": 1890,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-03-12": {
+      "positions": [
+        31
+      ],
+      "totalCases": 67,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-05-15": {
+      "positions": [
+        32
+      ],
+      "totalCases": 1456,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-01-30": {
+      "positions": [
+        33
+      ],
+      "totalCases": 3234,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2021-08-22": {
+      "positions": [
+        34
+      ],
+      "totalCases": 145,
+      "countries": [
+        "alemania"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-03-18": {
+      "positions": [
+        36
+      ],
+      "totalCases": 189,
+      "countries": [
+        "italia"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-06-25": {
+      "positions": [
+        37
+      ],
+      "totalCases": 1678,
+      "countries": [
+        "italia"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-05-14": {
+      "positions": [
+        38
+      ],
+      "totalCases": 2987,
+      "countries": [
+        "italia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2022-01-12": {
+      "positions": [
+        39
+      ],
+      "totalCases": 789,
+      "countries": [
+        "italia"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-03-03": {
+      "positions": [
+        40
+      ],
+      "totalCases": 1234,
+      "countries": [
+        "chile"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-04-15": {
+      "positions": [
+        41
+      ],
+      "totalCases": 56,
+      "countries": [
+        "chile"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-07-08": {
+      "positions": [
+        42
+      ],
+      "totalCases": 987,
+      "countries": [
+        "chile"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-06-20": {
+      "positions": [
+        43
+      ],
+      "totalCases": 1890,
+      "countries": [
+        "chile"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2022-03-10": {
+      "positions": [
+        44
+      ],
+      "totalCases": 456,
+      "countries": [
+        "chile"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-03-06": {
+      "positions": [
+        45
+      ],
+      "totalCases": 1567,
+      "countries": [
+        "peru"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2020-04-18": {
+      "positions": [
+        46
+      ],
+      "totalCases": 98,
+      "countries": [
+        "peru"
+      ],
+      "types": [
+        "death"
+      ]
+    },
+    "2020-08-12": {
+      "positions": [
+        47
+      ],
+      "totalCases": 1234,
+      "countries": [
+        "peru"
+      ],
+      "types": [
+        "recovered"
+      ]
+    },
+    "2021-07-25": {
+      "positions": [
+        48
+      ],
+      "totalCases": 2456,
+      "countries": [
+        "peru"
+      ],
+      "types": [
+        "confirmed"
+      ]
+    },
+    "2021-12-15": {
+      "positions": [
+        49
+      ],
+      "totalCases": 87,
+      "countries": [
+        "peru"
       ],
       "types": [
         "death"
