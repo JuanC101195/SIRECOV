@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug Excel Export - SIRECOV</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f7fafc;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.4);
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 50px;
+        }
+        .success { background: #c6f6d5; color: #22543d; }
+        .error { background: #fed7d7; color: #742a2a; }
+        .info { background: #bee3f8; color: #2a4365; }
+        .debug-info {
+            background: #faf5ff;
+            border: 1px solid #d6bcfa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug de Exportación Excel - SIRECOV</h1>
+        
+        <div class="test-section">
+            <h3>📊 Pruebas de Formato Excel</h3>
+            <button class="test-button" onclick="testExcelExport()">📊 Test Excel Básico</button>
+            <button class="test-button" onclick="testExcelWithFilters()">🇨🇴 Test Excel Colombia</button>
+            <button class="test-button" onclick="testAllFormats()">🎯 Test Todos los Formatos</button>
+            <button class="test-button" onclick="inspectHeaders()">🔍 Inspeccionar Cabeceras</button>
+        </div>
+        
+        <div id="results" class="results info">
+            <strong>🎯 Haz clic en un botón para iniciar las pruebas...</strong>
+        </div>
+        
+        <div id="debug-info"></div>
+    </div>
+
+    <script>
+        console.log('🔍 Debug Excel iniciado');
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            results.className = `results ${type}`;
+            results.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        function addDebugInfo(title, data) {
+            const debugDiv = document.getElementById('debug-info');
+            const debugBlock = document.createElement('div');
+            debugBlock.className = 'debug-info';
+            debugBlock.innerHTML = `<strong>${title}:</strong><br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            debugDiv.appendChild(debugBlock);
+        }
+        
+        async function testExcelExport() {
+            log('🔄 Iniciando test de Excel básico...', 'info');
+            
+            try {
+                const response = await fetch('/export/excel');
+                
+                log(`📡 Respuesta recibida - Status: ${response.status}`, 'info');
+                
+                // Inspeccionar cabeceras
+                const headers = {};
+                for (let [key, value] of response.headers.entries()) {
+                    headers[key] = value;
+                }
+                addDebugInfo('Cabeceras de Respuesta', headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                // Verificar tipo de contenido
+                const contentType = response.headers.get('content-type');
+                log(`📋 Content-Type: ${contentType}`, 'info');
+                
+                if (!contentType || !contentType.includes('spreadsheetml')) {
+                    log('⚠️ ADVERTENCIA: Content-Type no es Excel válido', 'error');
+                }
+                
+                // Obtener como ArrayBuffer
+                const arrayBuffer = await response.arrayBuffer();
+                log(`📦 ArrayBuffer recibido: ${arrayBuffer.byteLength} bytes`, 'success');
+                
+                // Verificar que sea un archivo Excel válido
+                const bytes = new Uint8Array(arrayBuffer);
+                const header = Array.from(bytes.slice(0, 4)).map(b => b.toString(16).padStart(2, '0')).join('');
+                log(`🔍 Primeros 4 bytes (hex): ${header}`, 'info');
+                
+                if (header === '504b0304' || header === '504b0506') {
+                    log('✅ ¡Es un archivo ZIP/Excel válido!', 'success');
+                } else {
+                    log('❌ NO es un archivo Excel válido', 'error');
+                    // Mostrar los primeros bytes como texto
+                    const textPreview = new TextDecoder().decode(bytes.slice(0, 100));
+                    addDebugInfo('Contenido como texto (primeros 100 chars)', textPreview);
+                }
+                
+                // Intentar descargar
+                const blob = new Blob([arrayBuffer], { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `debug_excel_${Date.now()}.xlsx`;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                log(`✅ Test completado - Archivo descargado como ${a.download}`, 'success');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                console.error('Error completo:', error);
+            }
+        }
+        
+        async function testExcelWithFilters() {
+            log('🔄 Test Excel con filtros (Colombia)...', 'info');
+            
+            try {
+                const response = await fetch('/export/excel?country=colombia');
+                const arrayBuffer = await response.arrayBuffer();
+                
+                log(`📦 Excel con filtros: ${arrayBuffer.byteLength} bytes`, 'success');
+                
+                const blob = new Blob([arrayBuffer], { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `colombia_excel_${Date.now()}.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                log('✅ Excel filtrado descargado correctamente', 'success');
+                
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAllFormats() {
+            log('🔄 Probando todos los formatos...', 'info');
+            
+            const formats = ['json', 'csv', 'excel'];
+            
+            for (const format of formats) {
+                try {
+                    log(`📋 Probando formato: ${format.toUpperCase()}`, 'info');
+                    
+                    const response = await fetch(`/export/${format}`);
+                    
+                    if (format === 'json') {
+                        const data = await response.json();
+                        log(`✅ JSON: ${data.summary?.totalRecords || 0} registros`, 'success');
+                    } else if (format === 'csv') {
+                        const text = await response.text();
+                        const lines = text.split('\\n').length - 1;
+                        log(`✅ CSV: ~${lines} líneas`, 'success');
+                    } else if (format === 'excel') {
+                        const arrayBuffer = await response.arrayBuffer();
+                        log(`✅ Excel: ${arrayBuffer.byteLength} bytes`, 'success');
+                    }
+                    
+                } catch (error) {
+                    log(`❌ ${format.toUpperCase()} falló: ${error.message}`, 'error');
+                }
+                
+                // Pausa entre requests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            log('🎯 Prueba de todos los formatos completada', 'info');
+        }
+        
+        async function inspectHeaders() {
+            log('🔍 Inspeccionando cabeceras de Excel...', 'info');
+            
+            try {
+                const response = await fetch('/export/excel', { method: 'HEAD' });
+                
+                const headers = {};
+                for (let [key, value] of response.headers.entries()) {
+                    headers[key] = value;
+                }
+                
+                addDebugInfo('Cabeceras Completas', headers);
+                
+                // Verificar cabeceras específicas
+                const contentType = response.headers.get('content-type');
+                const disposition = response.headers.get('content-disposition');
+                const length = response.headers.get('content-length');
+                
+                log(`Content-Type: ${contentType}`, contentType?.includes('spreadsheetml') ? 'success' : 'error');
+                log(`Content-Disposition: ${disposition}`, disposition?.includes('.xlsx') ? 'success' : 'error');
+                log(`Content-Length: ${length}`, length ? 'success' : 'error');
+                
+            } catch (error) {
+                log(`❌ Error inspeccionando: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-ejecutar test básico al cargar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('🚀 Página cargada. Listo para pruebas.', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

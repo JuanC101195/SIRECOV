@@ -1424,13 +1424,6 @@ function setupExportForm() {
         content = await response.text();
         filename = `sirecov_export_${new Date().toISOString().split('T')[0]}.csv`;
         blob = new Blob([content], { type: 'text/csv' });
-      } else if (format === 'excel') {
-        // Para Excel, obtener como array buffer
-        const arrayBuffer = await response.arrayBuffer();
-        filename = `sirecov_export_${new Date().toISOString().split('T')[0]}.xlsx`;
-        blob = new Blob([arrayBuffer], { 
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-        });
       }
       // Crear enlace de descarga
       const url = window.URL.createObjectURL(blob);
@@ -1450,8 +1443,8 @@ function setupExportForm() {
       let message = `✅ Archivo ${format.toUpperCase()} generado: ${filename}`;
       if (stats && stats.summary) {
         message += ` (${stats.summary.totalRecords} registros)`;
-      } else {
-        // Para Excel, obtener estadísticas del header de respuesta
+      } else if (format === 'csv') {
+        // Para CSV, obtener estadísticas del header de respuesta
         const recordCount = response.headers.get('X-Export-Records');
         if (recordCount) {
           message += ` (${recordCount} registros)`;
@@ -2125,21 +2118,17 @@ function toggleExportPreview() {
 function updateFormatSelection(format) {
   console.log('🎯 Formato seleccionado:', format);
   
-  // Resetear estilos - todos los formatos
+  // Resetear estilos - solo JSON y CSV
   document.getElementById('format-json').className = 'format-option border-3 border-gray-300 bg-white hover:border-blue-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
-  document.getElementById('format-csv').className = 'format-option border-3 border-gray-300 bg-white hover:border-orange-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
-  document.getElementById('format-excel').className = 'format-option border-3 border-gray-300 bg-white hover:border-green-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
+  document.getElementById('format-csv').className = 'format-option border-3 border-gray-300 bg-white hover:border-green-400 hover:shadow-lg p-6 rounded-xl text-center transition-all duration-300 transform hover:scale-105';
   
   // Aplicar estilo seleccionado
   if (format === 'json') {
     document.getElementById('format-json').className = 'format-option selected border-3 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
     document.getElementById('download-button-text').textContent = 'Descargar JSON';
   } else if (format === 'csv') {
-    document.getElementById('format-csv').className = 'format-option selected border-3 border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
+    document.getElementById('format-csv').className = 'format-option selected border-3 border-green-500 bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
     document.getElementById('download-button-text').textContent = 'Descargar CSV';
-  } else if (format === 'excel') {
-    document.getElementById('format-excel').className = 'format-option selected border-3 border-green-500 bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-center transition-all duration-300 shadow-xl transform scale-105';
-    document.getElementById('download-button-text').textContent = 'Descargar Excel';
   }
   
   // Mostrar secciones de filtros y descarga

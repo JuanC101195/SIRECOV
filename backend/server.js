@@ -492,10 +492,10 @@ app.get("/export/:format", async (req, res) => {
     const { country, startDate, endDate, type, validate = 'true' } = req.query;
     
     // Validar formatos soportados
-    if (!["json", "excel", "xlsx"].includes(format.toLowerCase())) {
+    if (!["json", "csv"].includes(format.toLowerCase())) {
       return res.status(400).json({ 
         ok: false, 
-        error: "Formato no soportado. Use 'json' o 'excel'" 
+        error: "Formato no soportado. Use 'json' o 'csv'" 
       });
     }
 
@@ -614,67 +614,29 @@ app.get("/export/:format", async (req, res) => {
       return res.json(exportData);
     }
     
-    // ===== EXPORTACIÓN EXCEL AVANZADA =====
-    if (format.toLowerCase() === "excel" || format.toLowerCase() === "xlsx") {
-      // Crear un nuevo workbook
-      const workbook = XLSX.utils.book_new();
+    // ===== EXPORTACIÓN CSV =====
+    if (format.toLowerCase() === "csv") {
+      // Generar CSV con encabezados
+      let csvContent = "country,date,type,cases\n";
       
-      // Hoja 1: Datos principales
-      const worksheet1 = XLSX.utils.json_to_sheet(records);
-      
-      // Configurar anchos de columna
-      worksheet1['!cols'] = [
-        { wch: 15 }, // País
-        { wch: 12 }, // Fecha
-        { wch: 12 }, // Tipo
-        { wch: 10 }  // Casos
-      ];
-      
-      XLSX.utils.book_append_sheet(workbook, worksheet1, "Datos COVID-19");
-      
-      // Hoja 2: Estadísticas
-      const statsData = [
-        { Métrica: "Total de Registros", Valor: stats.totalRecords },
-        { Métrica: "Total de Casos", Valor: stats.totalCases },
-        { Métrica: "Países Únicos", Valor: stats.uniqueCountries },
-        { Métrica: "Fechas Únicas", Valor: stats.uniqueDates },
-        { Métrica: "Casos Confirmados", Valor: stats.byType.confirmed || 0 },
-        { Métrica: "Fallecidos", Valor: stats.byType.deaths || 0 },
-        { Métrica: "Recuperados", Valor: stats.byType.recovered || 0 },
-        { Métrica: "Fecha de Exportación", Valor: new Date().toLocaleString('es-ES') }
-      ];
-      
-      const worksheet2 = XLSX.utils.json_to_sheet(statsData);
-      worksheet2['!cols'] = [{ wch: 20 }, { wch: 15 }];
-      XLSX.utils.book_append_sheet(workbook, worksheet2, "Estadísticas");
-      
-      // Hoja 3: Resumen por países
-      if (stats.topCountries && stats.topCountries.length > 0) {
-        const worksheet3 = XLSX.utils.json_to_sheet(stats.topCountries);
-        worksheet3['!cols'] = [{ wch: 15 }, { wch: 12 }];
-        XLSX.utils.book_append_sheet(workbook, worksheet3, "Por Países");
+      // Agregar datos
+      for (const record of records) {
+        csvContent += `"${record.country}","${record.date}","${record.type}",${record.cases}\n`;
       }
       
-      // Generar el archivo Excel
-      const excelBuffer = XLSX.write(workbook, { 
-        type: 'buffer', 
-        bookType: 'xlsx',
-        compression: true 
-      });
-
-      // Configurar cabeceras específicas para Excel
-      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      res.setHeader("Content-Disposition", `attachment; filename="sirecov_covid_data_${dateForFilename}.xlsx"`);
-      res.setHeader("Content-Length", excelBuffer.length);
-      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Expires", "0");
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="sirecov_covid_data_${dateForFilename}.csv"`);
       res.setHeader("X-Export-Records", records.length);
-      res.setHeader("X-Export-Format", "Excel");
+      res.setHeader("X-Export-Format", "CSV");
       
-      // Enviar como buffer binario
-      return res.end(excelBuffer, 'binary');
+      return res.send(csvContent);
     }
+    
+    // Si llega aquí, formato no reconocido
+    return res.status(400).json({ 
+      ok: false, 
+      error: "Formato no soportado. Use 'json' o 'csv'" 
+    });
     
   } catch (err) {
     console.error("❌ Error en exportación:", err);
@@ -1036,6 +998,52 @@ app.post("/index/rebuild", async (req, res) => {
       ok: false, 
       error: "Error reconstruyendo archivos de índice" 
     });
+  }
+});
+
+// Debug de Excel - página de prueba específica
+app.get("/debug-excel", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "test-excel-debug.html"));
+});
+
+// Test Excel mínimo para debugging
+app.get("/test-excel-minimal", (req, res) => {
+  try {
+    console.log("🧪 Generando Excel mínimo para test...");
+    
+    // Crear workbook simple
+    const workbook = XLSX.utils.book_new();
+    
+    // Datos de prueba mínimos
+    const testData = [
+      { País: "Colombia", Fecha: "2023-01-01", Tipo: "confirmed", Casos: 100 },
+      { País: "Brasil", Fecha: "2023-01-01", Tipo: "confirmed", Casos: 200 }
+    ];
+    
+    const worksheet = XLSX.utils.json_to_sheet(testData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Test");
+    
+    // Generar buffer
+    const buffer = XLSX.write(workbook, { 
+      type: 'buffer', 
+      bookType: 'xlsx' 
+    });
+    
+    console.log(`🔍 Buffer test generado: ${buffer.length} bytes`);
+    console.log(`🔍 Es Buffer?:`, Buffer.isBuffer(buffer));
+    console.log(`🔍 Primeros 4 bytes (hex):`, buffer.slice(0, 4).toString('hex'));
+    
+    // Configurar cabeceras
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", 'attachment; filename="test-minimal.xlsx"');
+    res.setHeader("Content-Length", buffer.length);
+    
+    // Enviar buffer directamente
+    res.end(buffer);
+    
+  } catch (error) {
+    console.error("❌ Error en test Excel:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
