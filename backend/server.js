@@ -322,6 +322,24 @@ app.get("/records/date-range", (req, res) => {
   }
 });
 
+// Estadísticas del B-Tree
+app.get("/btree/stats", (req, res) => {
+  try {
+    const stats = dateIndex.getStats();
+    const allKeys = dateIndex.getAllKeys();
+    
+    res.json({
+      ok: true,
+      ...stats,
+      allKeys: allKeys.slice(0, 50), // Limitar a 50 claves para performance
+      description: "Estadísticas del Árbol B+ para indexación de fechas"
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: "Error al obtener estadísticas del B-Tree" });
+  }
+});
+
 // Casos más críticos con Priority Queue
 app.get("/records/critical", (req, res) => {
   try {
@@ -1185,7 +1203,18 @@ app.get(/.*/, (req, res) => {
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-  await ensureFileWithHeader();
-  await buildIndexes();
-  console.log(`✅ SIRECOV corriendo en http://localhost:${PORT}`);
+  try {
+    await ensureFileWithHeader();
+    await buildIndexes();
+    console.log(`✅ SIRECOV corriendo en http://localhost:${PORT}`);
+  } catch (error) {
+    console.error('❌ Error al inicializar el servidor:', error);
+    process.exit(1);
+  }
+}).on('error', (err) => {
+  console.error('❌ Error del servidor:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`⚠️  El puerto ${PORT} ya está en uso`);
+    process.exit(1);
+  }
 });

@@ -1159,6 +1159,17 @@ function setupRangeSearch() {
       const result = await response.json();
       
       if (result.ok && result.records) {
+        // Actualizar visualización del B-Tree si está visible
+        if (BTreeVisualizer.isVisible) {
+          await refreshBTreeVisualization();
+          showBTreeSearchInfo({
+            startDate,
+            endDate,
+            durationMs: result.durationMs || 0,
+            count: result.records.length
+          });
+        }
+        
         resultsDiv.innerHTML = `
           <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
             <div class="flex justify-between items-center mb-4">
@@ -2434,3 +2445,222 @@ console.log('🔍 Validando funciones de exportación:', {
   setupExportForm: typeof setupExportForm,
   quickExport: typeof window.quickExport
 });
+
+// ==================== VISUALIZACIÓN DEL B-TREE ====================
+
+// Estado de visualización del B-Tree
+const BTreeVisualizer = {
+  isVisible: false,
+  treeData: null,
+  searchPath: []
+};
+
+// Toggle visualización del B-Tree
+window.toggleBTreeVisualization = async function() {
+  const panel = document.getElementById('btree-visualization-panel');
+  const stats = document.getElementById('btree-stats');
+  const toggleText = document.getElementById('btree-toggle-text');
+  
+  BTreeVisualizer.isVisible = !BTreeVisualizer.isVisible;
+  
+  if (BTreeVisualizer.isVisible) {
+    panel.classList.remove('hidden');
+    stats.classList.remove('hidden');
+    toggleText.textContent = '🙈 Ocultar Árbol';
+    await refreshBTreeVisualization();
+  } else {
+    panel.classList.add('hidden');
+    stats.classList.add('hidden');
+    toggleText.textContent = '👁️ Mostrar Árbol';
+  }
+};
+
+// Actualizar visualización del B-Tree
+window.refreshBTreeVisualization = async function() {
+  try {
+    const canvas = document.getElementById('btree-canvas');
+    canvas.innerHTML = `
+      <div class="text-center py-4">
+        <div class="animate-spin inline-block w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+        <div class="text-purple-600 font-medium mt-2">Cargando estructura del árbol...</div>
+      </div>
+    `;
+    
+    // Obtener estadísticas del B-Tree
+    const response = await fetch('/btree/stats');
+    const data = await response.json();
+    
+    if (data.ok) {
+      BTreeVisualizer.treeData = data;
+      
+      // Actualizar estadísticas
+      document.getElementById('btree-stat-size').textContent = data.size || 0;
+      document.getElementById('btree-stat-height').textContent = data.height || 1;
+      document.getElementById('btree-stat-nodes').textContent = data.totalNodes || 1;
+      document.getElementById('btree-stat-keys').textContent = data.uniqueKeys || 0;
+      
+      // Renderizar árbol
+      renderBTreeStructure(data);
+    } else {
+      canvas.innerHTML = `
+        <div class="text-center py-8 text-red-500">
+          <div class="text-4xl mb-2">⚠️</div>
+          <div>Error al cargar el árbol</div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Error loading B-Tree:', error);
+    const canvas = document.getElementById('btree-canvas');
+    canvas.innerHTML = `
+      <div class="text-center py-8 text-red-500">
+        <div class="text-4xl mb-2">❌</div>
+        <div>Error de conexión</div>
+      </div>
+    `;
+  }
+};
+
+// Renderizar estructura del B-Tree
+function renderBTreeStructure(data) {
+  const canvas = document.getElementById('btree-canvas');
+  
+  if (!data || data.size === 0) {
+    canvas.innerHTML = `
+      <div class="text-center py-12 text-gray-400">
+        <div class="text-5xl mb-3">🌱</div>
+        <div class="text-lg font-medium">Árbol Vacío</div>
+        <div class="text-sm mt-1">Realiza una búsqueda para ver el árbol en acción</div>
+      </div>
+    `;
+    return;
+  }
+  
+  // Crear visualización simplificada del árbol
+  const keys = data.allKeys || [];
+  const totalLevels = data.height || 1;
+  
+  let html = `
+    <div class="font-mono text-sm">
+      <div class="mb-4 text-center">
+        <span class="text-purple-800 font-bold">🌳 Árbol B+ (grado=${data.degree || 4})</span>
+        <span class="text-gray-500 ml-3">→ ${data.size} elementos, ${totalLevels} niveles</span>
+      </div>
+  `;
+  
+  // Visualización simplificada por niveles
+  if (keys.length > 0) {
+    const keysPerLevel = Math.ceil(keys.length / totalLevels);
+    
+    for (let level = 0; level < totalLevels; level++) {
+      const levelKeys = keys.slice(level * keysPerLevel, (level + 1) * keysPerLevel);
+      const isLeaf = level === totalLevels - 1;
+      
+      html += `
+        <div class="mb-3 pl-${level * 4}">
+          <div class="text-xs text-gray-500 mb-1">Nivel ${level + 1}:</div>
+          <div class="flex flex-wrap gap-2">
+      `;
+      
+      levelKeys.forEach((key, idx) => {
+        const bgColor = isLeaf ? 'bg-green-100 border-green-300' : 'bg-purple-100 border-purple-300';
+        const textColor = isLeaf ? 'text-green-800' : 'text-purple-800';
+        const icon = isLeaf ? '🍃' : '🌿';
+        
+        html += `
+          <div class="border-2 ${bgColor} ${textColor} px-3 py-2 rounded-lg shadow-sm hover:shadow transition-shadow">
+            <span class="mr-1">${icon}</span>
+            <span class="font-medium">${key}</span>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  html += `
+      <div class="mt-6 pt-4 border-t border-gray-200">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div class="bg-purple-50 p-2 rounded">
+            <div class="text-gray-600">Min Key</div>
+            <div class="font-bold text-purple-800">${data.minKey || 'N/A'}</div>
+          </div>
+          <div class="bg-purple-50 p-2 rounded">
+            <div class="text-gray-600">Max Key</div>
+            <div class="font-bold text-purple-800">${data.maxKey || 'N/A'}</div>
+          </div>
+          <div class="bg-purple-50 p-2 rounded">
+            <div class="text-gray-600">Fill Factor</div>
+            <div class="font-bold text-purple-800">${data.fillFactor || 'N/A'}</div>
+          </div>
+          <div class="bg-purple-50 p-2 rounded">
+            <div class="text-gray-600">Leaf Nodes</div>
+            <div class="font-bold text-purple-800">${data.leafNodes || 'N/A'}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  canvas.innerHTML = html;
+}
+
+// Mostrar información de búsqueda
+function showBTreeSearchInfo(searchData) {
+  const infoPanel = document.getElementById('btree-search-info');
+  const detailsDiv = document.getElementById('btree-search-details');
+  
+  if (!searchData) {
+    infoPanel.classList.add('hidden');
+    return;
+  }
+  
+  let html = `
+    <div class="grid md:grid-cols-3 gap-4">
+      <div>
+        <div class="text-xs text-purple-600 font-medium">Rango Buscado</div>
+        <div class="font-mono text-sm">${searchData.startDate} → ${searchData.endDate}</div>
+      </div>
+      <div>
+        <div class="text-xs text-purple-600 font-medium">Tiempo de Búsqueda</div>
+        <div class="text-lg font-bold text-green-600">${searchData.durationMs}ms</div>
+      </div>
+      <div>
+        <div class="text-xs text-purple-600 font-medium">Resultados</div>
+        <div class="text-lg font-bold text-purple-800">${searchData.count} registros</div>
+      </div>
+    </div>
+    <div class="mt-3 pt-3 border-t border-purple-200">
+      <div class="text-xs text-purple-600 font-medium mb-1">Complejidad Teórica</div>
+      <div class="text-sm text-gray-700">
+        O(log n + k) donde n = ${BTreeVisualizer.treeData?.size || 0} elementos, k = ${searchData.count} resultados
+      </div>
+    </div>
+  `;
+  
+  detailsDiv.innerHTML = html;
+  infoPanel.classList.remove('hidden');
+  
+  // Animar el panel
+  infoPanel.style.animation = 'slideIn 0.3s ease-out';
+}
+
+// Agregar animación al CSS inline
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+document.head.appendChild(style);
