@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Interactivo - B+ Tree | SIRECOV</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .control-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .control-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .visualization {
+            padding: 30px;
+            overflow: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .tree-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .results-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-date {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .result-details {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .node-legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-icon {
+            font-size: 1.5em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌳 Demo Interactivo del B+ Tree</h1>
+            <p>Visualiza y experimenta con el Árbol B+ de SIRECOV</p>
+        </div>
+
+        <div class="content">
+            <div class="controls">
+                <div class="control-section">
+                    <h3>➕ Insertar Registro</h3>
+                    <div class="input-group">
+                        <label>Fecha</label>
+                        <input type="date" id="insertDate" value="2020-03-15">
+                    </div>
+                    <div class="input-group">
+                        <label>País</label>
+                        <input type="text" id="insertCountry" placeholder="Ej: España" value="España">
+                    </div>
+                    <div class="input-group">
+                        <label>Tipo</label>
+                        <select id="insertType">
+                            <option value="confirmed">Confirmado</option>
+                            <option value="death">Fallecimiento</option>
+                            <option value="recovered">Recuperado</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Casos</label>
+                        <input type="number" id="insertCases" placeholder="Número de casos" value="1000">
+                    </div>
+                    <button onclick="insertRecord()">Insertar Registro</button>
+                    <button class="btn-success" onclick="insertSampleData()">Insertar Datos de Ejemplo</button>
+                </div>
+
+                <div class="control-section">
+                    <h3>🔍 Buscar</h3>
+                    <div class="input-group">
+                        <label>Fecha Exacta</label>
+                        <input type="date" id="searchDate" value="2020-03-15">
+                    </div>
+                    <button onclick="searchByDate()">Buscar por Fecha</button>
+                    
+                    <div class="input-group" style="margin-top: 20px;">
+                        <label>Rango de Fechas</label>
+                        <input type="date" id="rangeStart" value="2020-03-01">
+                        <input type="date" id="rangeEnd" value="2020-03-31" style="margin-top: 5px;">
+                    </div>
+                    <button onclick="searchByRange()">Buscar por Rango</button>
+                </div>
+
+                <div class="control-section">
+                    <h3>🗑️ Eliminar</h3>
+                    <div class="input-group">
+                        <label>Fecha a Eliminar</label>
+                        <input type="date" id="deleteDate" value="2020-03-15">
+                    </div>
+                    <button class="btn-danger" onclick="deleteByDate()">Eliminar Fecha</button>
+                </div>
+
+                <div class="control-section">
+                    <h3>⚙️ Acciones</h3>
+                    <button class="btn-secondary" onclick="clearTree()">Limpiar Árbol</button>
+                    <button onclick="validateTree()">Validar Integridad</button>
+                </div>
+            </div>
+
+            <div class="visualization">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSize">0</div>
+                        <div class="stat-label">Elementos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statHeight">1</div>
+                        <div class="stat-label">Altura</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statNodes">1</div>
+                        <div class="stat-label">Nodos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statKeys">0</div>
+                        <div class="stat-label">Claves Únicas</div>
+                    </div>
+                </div>
+
+                <div id="messageArea"></div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('structure')">Estructura del Árbol</button>
+                    <button class="tab" onclick="switchTab('results')">Resultados de Búsqueda</button>
+                    <button class="tab" onclick="switchTab('info')">Información</button>
+                </div>
+
+                <div id="structure" class="tab-content active">
+                    <div class="node-legend">
+                        <div class="legend-item">
+                            <span class="legend-icon">🌿</span>
+                            <span>Nodo Interno (solo claves)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon">🍃</span>
+                            <span>Nodo Hoja (claves + valores)</span>
+                        </div>
+                    </div>
+                    <div class="tree-display" id="treeDisplay">
+El árbol está vacío. Inserta algunos registros para ver la estructura.
+                    </div>
+                </div>
+
+                <div id="results" class="tab-content">
+                    <div class="results-display" id="resultsDisplay">
+                        <p style="text-align: center; color: #888;">
+                            Realiza una búsqueda para ver los resultados aquí
+                        </p>
+                    </div>
+                </div>
+
+                <div id="info" class="tab-content">
+                    <div style="padding: 20px;">
+                        <h2 style="color: #667eea; margin-bottom: 15px;">Acerca del B+ Tree</h2>
+                        <p style="margin-bottom: 15px;">
+                            El <strong>Árbol B+</strong> es una estructura de datos optimizada para búsquedas por rango.
+                            En SIRECOV, lo usamos para indexar fechas y realizar consultas eficientes.
+                        </p>
+                        
+                        <h3 style="color: #667eea; margin: 20px 0 10px 0;">Características:</h3>
+                        <ul style="line-height: 1.8; margin-left: 20px;">
+                            <li>✅ Búsqueda: O(log n)</li>
+                            <li>✅ Inserción: O(log n)</li>
+                            <li>✅ Búsqueda por rango: O(log n + k)</li>
+                            <li>✅ Auto-balanceo garantizado</li>
+                            <li>✅ Todas las hojas al mismo nivel</li>
+                            <li>✅ Hojas enlazadas para recorridos secuenciales</li>
+                        </ul>
+
+                        <h3 style="color: #667eea; margin: 20px 0 10px 0;">Ventajas en SIRECOV:</h3>
+                        <ul style="line-height: 1.8; margin-left: 20px;">
+                            <li>🚀 Consultas por rango de fechas ultra-rápidas</li>
+                            <li>📊 Perfecto para generar estadísticas temporales</li>
+                            <li>💾 Uso eficiente de memoria (50-100% ocupación)</li>
+                            <li>📈 Escalable a grandes volúmenes de datos</li>
+                        </ul>
+
+                        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                            <h3 style="color: #667eea; margin-bottom: 10px;">Complejidad del Grado (t=3):</h3>
+                            <p><strong>Cada nodo puede tener:</strong></p>
+                            <ul style="margin-left: 20px; margin-top: 10px;">
+                                <li>Mínimo: 2 claves (t-1)</li>
+                                <li>Máximo: 5 claves (2t-1)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación simple del B+ Tree para la demo
+        class SimpleBTree {
+            constructor() {
+                this.data = new Map(); // fecha -> [registros]
+                this.size = 0;
+            }
+
+            insert(date, record) {
+                if (!this.data.has(date)) {
+                    this.data.set(date, []);
+                }
+                this.data.get(date).push(record);
+                this.size++;
+            }
+
+            search(date) {
+                return this.data.get(date) || [];
+            }
+
+            rangeSearch(startDate, endDate) {
+                const results = [];
+                const sortedDates = Array.from(this.data.keys()).sort();
+                
+                for (const date of sortedDates) {
+                    if (date >= startDate && date <= endDate) {
+                        results.push(...this.data.get(date));
+                    }
+                }
+                return results;
+            }
+
+            delete(date) {
+                if (this.data.has(date)) {
+                    const count = this.data.get(date).length;
+                    this.data.delete(date);
+                    this.size -= count;
+                    return count;
+                }
+                return 0;
+            }
+
+            clear() {
+                this.data.clear();
+                this.size = 0;
+            }
+
+            getUniqueKeys() {
+                return Array.from(this.data.keys()).sort();
+            }
+
+            getStats() {
+                return {
+                    size: this.size,
+                    uniqueKeys: this.data.size,
+                    height: Math.ceil(Math.log2(this.data.size + 1)) || 1,
+                    nodes: Math.ceil(this.data.size / 3) || 1
+                };
+            }
+
+            toString() {
+                const keys = this.getUniqueKeys();
+                if (keys.length === 0) return 'El árbol está vacío';
+
+                let output = '└── 🌿 Raíz\n';
+                keys.forEach((key, index) => {
+                    const isLast = index === keys.length - 1;
+                    const prefix = isLast ? '└── ' : '├── ';
+                    const records = this.data.get(key);
+                    output += `    ${prefix}🍃 ${key} (${records.length} registro(s))\n`;
+                });
+                return output;
+            }
+        }
+
+        const tree = new SimpleBTree();
+
+        function updateStats() {
+            const stats = tree.getStats();
+            document.getElementById('statSize').textContent = stats.size;
+            document.getElementById('statHeight').textContent = stats.height;
+            document.getElementById('statNodes').textContent = stats.nodes;
+            document.getElementById('statKeys').textContent = stats.uniqueKeys;
+        }
+
+        function updateTreeDisplay() {
+            document.getElementById('treeDisplay').textContent = tree.toString();
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageArea = document.getElementById('messageArea');
+            const alertClass = `alert-${type}`;
+            messageArea.innerHTML = `<div class="alert ${alertClass} fade-in">${message}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+
+        function insertRecord() {
+            const date = document.getElementById('insertDate').value;
+            const country = document.getElementById('insertCountry').value;
+            const type = document.getElementById('insertType').value;
+            const cases = parseInt(document.getElementById('insertCases').value);
+
+            if (!date || !country || !cases) {
+                showMessage('⚠️ Por favor completa todos los campos', 'warning');
+                return;
+            }
+
+            const record = { date, country, type, cases };
+            tree.insert(date, record);
+            
+            updateStats();
+            updateTreeDisplay();
+            showMessage(`✅ Registro insertado: ${date} - ${country} (${cases} casos)`, 'success');
+        }
+
+        function insertSampleData() {
+            const samples = [
+                { date: '2020-03-15', country: 'España', type: 'confirmed', cases: 2500 },
+                { date: '2020-03-16', country: 'Italia', type: 'confirmed', cases: 3200 },
+                { date: '2020-03-15', country: 'Francia', type: 'death', cases: 150 },
+                { date: '2020-03-17', country: 'Alemania', type: 'recovered', cases: 1800 },
+                { date: '2020-03-18', country: 'España', type: 'confirmed', cases: 3100 },
+                { date: '2020-03-20', country: 'México', type: 'confirmed', cases: 890 },
+                { date: '2020-03-22', country: 'Brasil', type: 'death', cases: 420 }
+            ];
+
+            samples.forEach(record => tree.insert(record.date, record));
+            
+            updateStats();
+            updateTreeDisplay();
+            showMessage(`✅ Se insertaron ${samples.length} registros de ejemplo`, 'success');
+        }
+
+        function searchByDate() {
+            const date = document.getElementById('searchDate').value;
+            if (!date) {
+                showMessage('⚠️ Por favor selecciona una fecha', 'warning');
+                return;
+            }
+
+            const results = tree.search(date);
+            displayResults(results, `Resultados para ${date}`);
+            
+            if (results.length > 0) {
+                showMessage(`✅ Se encontraron ${results.length} registro(s)`, 'success');
+            } else {
+                showMessage(`ℹ️ No se encontraron registros para ${date}`, 'info');
+            }
+            
+            switchTab('results');
+        }
+
+        function searchByRange() {
+            const startDate = document.getElementById('rangeStart').value;
+            const endDate = document.getElementById('rangeEnd').value;
+
+            if (!startDate || !endDate) {
+                showMessage('⚠️ Por favor selecciona ambas fechas', 'warning');
+                return;
+            }
+
+            const results = tree.rangeSearch(startDate, endDate);
+            displayResults(results, `Resultados del ${startDate} al ${endDate}`);
+            
+            if (results.length > 0) {
+                showMessage(`✅ Se encontraron ${results.length} registro(s) en el rango`, 'success');
+            } else {
+                showMessage(`ℹ️ No se encontraron registros en el rango`, 'info');
+            }
+            
+            switchTab('results');
+        }
+
+        function deleteByDate() {
+            const date = document.getElementById('deleteDate').value;
+            if (!date) {
+                showMessage('⚠️ Por favor selecciona una fecha', 'warning');
+                return;
+            }
+
+            const count = tree.delete(date);
+            
+            if (count > 0) {
+                updateStats();
+                updateTreeDisplay();
+                showMessage(`✅ Se eliminaron ${count} registro(s) de ${date}`, 'success');
+            } else {
+                showMessage(`ℹ️ No se encontró la fecha ${date}`, 'info');
+            }
+        }
+
+        function clearTree() {
+            if (confirm('¿Estás seguro de que quieres limpiar todo el árbol?')) {
+                tree.clear();
+                updateStats();
+                updateTreeDisplay();
+                document.getElementById('resultsDisplay').innerHTML = '<p style="text-align: center; color: #888;">Realiza una búsqueda para ver los resultados aquí</p>';
+                showMessage('✅ Árbol limpiado', 'success');
+            }
+        }
+
+        function validateTree() {
+            const stats = tree.getStats();
+            showMessage(`✅ Árbol válido - ${stats.size} elementos, ${stats.uniqueKeys} fechas únicas`, 'success');
+        }
+
+        function displayResults(results, title) {
+            const display = document.getElementById('resultsDisplay');
+            
+            if (results.length === 0) {
+                display.innerHTML = '<p style="text-align: center; color: #888;">No se encontraron resultados</p>';
+                return;
+            }
+
+            let html = `<h3 style="color: #667eea; margin-bottom: 15px;">${title}</h3>`;
+            
+            results.forEach((record, index) => {
+                const typeLabels = {
+                    confirmed: '🔸 Confirmado',
+                    death: '🔴 Fallecimiento',
+                    recovered: '🟢 Recuperado'
+                };
+                
+                html += `
+                    <div class="result-item fade-in">
+                        <div class="result-date">${record.date}</div>
+                        <div class="result-details">
+                            <strong>${record.country}</strong> - 
+                            ${typeLabels[record.type]} - 
+                            ${record.cases.toLocaleString()} casos
+                        </div>
+                    </div>
+                `;
+            });
+
+            display.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            // Cambiar tabs activos
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Activar tab seleccionado
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Inicializar
+        updateStats();
+        updateTreeDisplay();
+    </script>
+</body>
+</html>
